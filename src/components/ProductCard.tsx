@@ -53,6 +53,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const formatPrice = useCallback((price: string) => {
+    if (!price) return 'Preço não disponível';
     if (price.includes('R$')) {
       return price;
     }
@@ -60,6 +61,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const getCategoryIcon = useCallback((category: string) => {
+    if (!category) return Scale;
     if (category.includes('Livros') || category.includes('Códigos')) {
       return BookOpen;
     }
@@ -85,6 +87,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     e.stopPropagation();
     window.open(product.link, '_blank');
   }, [product.link]);
+
+  const handleVerMaisClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDetailModalOpen(true);
+  }, []);
 
   const images = getProductImages(product);
   const CategoryIcon = getCategoryIcon(product.categoria);
@@ -172,7 +179,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           
           <div className="flex items-center justify-between mb-3">
             <div className={`font-bold text-red-600 ${compact ? 'text-sm' : 'text-lg'}`}>
-              Por menos de {formatPrice(product.valor)}
+              {formatPrice(product.valor)}
             </div>
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-amber-500 fill-current" />
@@ -194,7 +201,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 ${
                 compact ? 'py-2 text-sm' : 'py-3 text-base'
               }`}
-              onClick={handleCardClick}
+              onClick={handleVerMaisClick}
             >
               <BookOpen className="w-4 h-4 mr-2" />
               Ver mais

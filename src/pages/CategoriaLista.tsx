@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Star, ShoppingCart, Filter, Grid } from 'lucide-react';
@@ -159,6 +158,7 @@ const CategoriaLista = () => {
   };
 
   const formatPrice = (price: string) => {
+    if (!price) return 'Preço não disponível';
     if (price.includes('R$')) {
       return price;
     }
@@ -218,62 +218,13 @@ const CategoriaLista = () => {
   };
 
   const renderProductCard = (product: Product, index: number) => (
-    <Card key={product.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => handleProductClick(product)}>
-      <CardContent className="p-0">
-        <div className="aspect-square relative">
-          <OptimizedImage 
-            src={product.imagem1} 
-            alt={product.produto} 
-            className="w-full h-full" 
-          />
-          <div className="absolute top-2 right-2">
-            <FavoriteButton productId={product.id} size="sm" />
-          </div>
-          {tipo === 'mais-vendidos' && index < 3 && (
-            <Badge className="absolute top-2 left-2 bg-red-500 text-white text-xs">
-              TOP {index + 1}
-            </Badge>
-          )}
-        </div>
-        
-        <div className="p-3">
-          <h3 className="font-medium text-gray-900 text-sm line-clamp-3 leading-relaxed mb-3 min-h-[3.75rem]">
-            {product.produto}
-          </h3>
-          
-          <div className="flex items-center justify-between mb-3">
-            <div className="font-bold text-red-500 text-sm">
-              {formatPrice(product.valor)}
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-3 h-3 text-yellow-400 fill-current" />
-              <span className="text-xs text-gray-600">4.8</span>
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <ProductPhotosModal 
-              images={getProductImages(product)} 
-              productName={product.produto} 
-              productPrice={formatPrice(product.valor)} 
-              productLink={product.link}
-              videoUrl={product.video}
-            />
-            <Button 
-              size="sm" 
-              className="w-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-semibold text-xs"  
-              onClick={(e) => {
-                e.stopPropagation();
-                window.open(product.link, '_blank');
-              }}
-            >
-              <ShoppingCart className="w-3 h-3 mr-1" />
-              Comprar
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+    <ProductCard 
+      key={product.id} 
+      product={product} 
+      showBadge={tipo === 'mais-vendidos' && index < 3}
+      badgeText={`TOP ${index + 1}`}
+      compact={true}
+    />
   );
 
   if (loading) {
