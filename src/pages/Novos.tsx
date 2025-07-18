@@ -9,7 +9,6 @@ import { ProductVideoModal } from '@/components/ProductVideoModal';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
 import { OptimizedImage } from '@/components/OptimizedImage';
-import { FavoriteButton } from '@/components/FavoriteButton';
 
 interface Product {
   id: number;
@@ -123,11 +122,11 @@ const Novos = () => {
             Voltar
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-white animate-slide-in-left flex items-center gap-3">
-              <Sparkles className="w-8 h-8 text-yellow-400" />
+            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left flex items-center gap-3">
+              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
               📚 Lançamentos Jurídicos
             </h1>
-            <p className="text-white/80 animate-slide-in-right text-lg">
+            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
               Os {products.length} livros e materiais mais recentes da nossa livraria
             </p>
           </div>
@@ -149,7 +148,7 @@ const Novos = () => {
             </Button>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {products.map((product, index) => {
               const rating = getSimulatedRating(product.id);
               const hasVideo = product.video && product.video.trim() !== '';
@@ -157,13 +156,13 @@ const Novos = () => {
               return (
                 <div 
                   key={product.id} 
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 animate-fade-in cursor-pointer group hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20" 
+                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 hover:bg-white/15 transition-all duration-300 animate-fade-in cursor-pointer group hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20" 
                   style={{ animationDelay: `${index * 0.1}s` }}
                   onClick={() => handleProductClick(product)}
                 >
-                  <div className="flex gap-6">
+                  <div className="flex gap-4 md:gap-6">
                     {/* Enhanced Thumbnail */}
-                    <div className="w-32 h-40 flex-shrink-0 rounded-xl overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 rounded-xl overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
                       <OptimizedImage 
                         src={product.imagem1} 
                         alt={product.produto} 
@@ -172,17 +171,17 @@ const Novos = () => {
                       {hasVideo && (
                         <div className="absolute top-2 right-2">
                           <div className="bg-red-600/90 rounded-full p-1.5 shadow-lg animate-pulse">
-                            <Video className="w-4 h-4 text-white" />
+                            <Video className="w-3 h-3 md:w-4 md:h-4 text-white" />
                           </div>
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                     
-                    <div className="flex-1 min-w-0 space-y-4">
+                    <div className="flex-1 min-w-0 space-y-3 md:space-y-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs animate-pulse">
                               LANÇAMENTO
                             </Badge>
@@ -191,7 +190,7 @@ const Novos = () => {
                             </Badge>
                           </div>
                           
-                          <h3 className="text-white font-semibold text-lg md:text-xl line-clamp-2 mb-3 group-hover:text-purple-200 transition-colors">
+                          <h3 className="text-white font-semibold text-base md:text-lg xl:text-xl line-clamp-2 mb-3 group-hover:text-purple-200 transition-colors">
                             {product.produto}
                           </h3>
                           
@@ -201,7 +200,7 @@ const Novos = () => {
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star 
                                   key={star} 
-                                  className={`w-4 h-4 ${
+                                  className={`w-3 h-3 md:w-4 md:h-4 ${
                                     star <= Math.floor(rating) 
                                       ? 'text-yellow-400 fill-yellow-400' 
                                       : star <= rating 
@@ -211,34 +210,33 @@ const Novos = () => {
                                 />
                               ))}
                             </div>
-                            <span className="text-white/80 text-sm font-medium">
+                            <span className="text-white/80 text-xs md:text-sm font-medium">
                               {rating.toFixed(1)} • {Math.floor(Math.random() * 150) + 10} avaliações
                             </span>
                           </div>
                           
-                          <div className="text-amber-400 font-bold text-2xl mb-4 group-hover:text-amber-300 transition-colors">
+                          <div className="text-amber-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-amber-300 transition-colors">
                             {formatPrice(product.valor)}
                           </div>
                         </div>
                         
-                        <div className="flex items-center gap-2">
-                          <FavoriteButton productId={product.id} />
-                          <div className="flex items-center gap-1 text-white/60 text-sm">
-                            <Eye className="w-4 h-4" />
+                        <div className="flex items-center gap-1 md:gap-2">
+                          <div className="flex items-center gap-1 text-white/60 text-xs md:text-sm">
+                            <Eye className="w-3 h-3 md:w-4 md:h-4" />
                             <span>{Math.floor(Math.random() * 500) + 50}</span>
                           </div>
                         </div>
                       </div>
                       
                       {/* Action Buttons */}
-                      <div className="flex items-center gap-3 flex-wrap">
+                      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
                         <Button 
                           size="sm" 
                           onClick={(e) => {
                             e.stopPropagation();
                             handleProductClick(product);
                           }}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                         >
                           Ver detalhes
                         </Button>
@@ -248,9 +246,9 @@ const Novos = () => {
                             size="sm" 
                             variant="outline"
                             onClick={(e) => handleVideoClick(product, e)}
-                            className="bg-red-500/20 border-red-400/50 text-red-300 hover:bg-red-500/30 text-sm px-4 py-2 font-semibold transition-all duration-300 hover:scale-105"
+                            className="bg-red-500/20 border-red-400/50 text-red-300 hover:bg-red-500/30 text-xs md:text-sm px-3 md:px-4 py-2 font-semibold transition-all duration-300 hover:scale-105"
                           >
-                            <Play className="w-4 h-4 mr-2" />
+                            <Play className="w-3 h-3 md:w-4 md:h-4 mr-2" />
                             Assistir vídeo
                           </Button>
                         )}
@@ -258,10 +256,10 @@ const Novos = () => {
                         <Button 
                           size="sm" 
                           asChild 
-                          className="bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                          className="bg-green-500 hover:bg-green-600 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                         >
                           <a href={product.link} target="_blank" rel="noopener noreferrer">
-                            <ShoppingBag className="w-4 h-4 mr-2" />
+                            <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 mr-2" />
                             Comprar agora
                           </a>
                         </Button>
@@ -285,7 +283,7 @@ const Novos = () => {
       )}
 
       {/* Video Modal */}
-      {selectedProduct && hasVideo && (
+      {selectedProduct && (
         <ProductVideoModal
           isOpen={isVideoModalOpen}
           onClose={() => setIsVideoModalOpen(false)}

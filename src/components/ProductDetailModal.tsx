@@ -7,10 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { X, ShoppingCart, Heart, Star, Play, Info, Sparkles } from 'lucide-react';
-import { ImageZoomModal } from '@/components/ImageZoomModal';
 import { ProductVideoModal } from '@/components/ProductVideoModal';
 import { ProductBreadcrumb } from '@/components/ProductBreadcrumb';
 import { ShareButton } from '@/components/ShareButton';
+import { FavoriteButton } from '@/components/FavoriteButton';
 import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
@@ -39,9 +39,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   product
 }) => {
-  const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -88,11 +86,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     return `${product.produto} é um ${category.toLowerCase()} essencial para profissionais do direito. Oferece conteúdo atualizado e de alta qualidade, desenvolvido por especialistas renomados. Ideal para estudo, consulta e aplicação prática no exercício da advocacia.`;
   };
 
-  const handleImageClick = (index: number) => {
-    setSelectedImageIndex(index);
-    setIsZoomOpen(true);
-  };
-
   const handleBuyClick = () => {
     window.open(product.link, '_blank');
   };
@@ -108,15 +101,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-hidden p-0 bg-white">
-          {/* Header with breadcrumb */}
+        <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] overflow-hidden p-0 bg-white">
+          {/* Header with breadcrumb - Mobile Optimized */}
           <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white">
-            <div className="flex items-center justify-between p-3">
-              <div className="flex-1 pr-4">
-                <h2 className="text-lg font-bold line-clamp-1 mb-1">
+            <div className="flex items-center justify-between p-3 md:p-4">
+              <div className="flex-1 pr-3 md:pr-4 min-w-0">
+                <h2 className="text-sm md:text-lg font-bold line-clamp-2 mb-1">
                   {product.produto}
                 </h2>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Badge className="bg-white/20 text-white border-white/30 text-xs">
                     {product.categoria}
                   </Badge>
@@ -130,62 +123,60 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 onClick={onClose}
                 variant="ghost" 
                 size="sm"
-                className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-10 h-10 p-0 flex-shrink-0"
+                className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-8 h-8 md:w-10 md:h-10 p-0 flex-shrink-0"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4 md:w-5 md:h-5" />
               </Button>
             </div>
-            <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
+            <div className="px-3 md:px-4">
+              <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
+            </div>
           </div>
 
-          {/* Layout principal */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {/* Layout principal - Mobile First */}
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
             
-            {/* Galeria - 1/3 do espaço */}
+            {/* Galeria - Full width on mobile, 1/3 on desktop */}
             <div className="lg:col-span-1">
-              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner" style={{ aspectRatio: '2/3' }}>
+              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner aspect-[2/3]">
                 <Carousel className="w-full h-full">
                   <CarouselContent>
                     {getProductImages().map((image, index) => (
                       <CarouselItem key={index}>
-                        <div 
-                          className="h-full cursor-pointer group"
-                          onClick={() => handleImageClick(index)}
-                        >
+                        <div className="h-full">
                           <img
                             src={image}
                             alt={`${product.produto} - ${index + 1}`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                            className="w-full h-full object-cover"
                           />
                         </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="left-2 bg-white/90 hover:bg-white shadow-lg w-6 h-6" />
-                  <CarouselNext className="right-2 bg-white/90 hover:bg-white shadow-lg w-6 h-6" />
+                  <CarouselPrevious className="left-2 bg-white/90 hover:bg-white shadow-lg w-8 h-8" />
+                  <CarouselNext className="right-2 bg-white/90 hover:bg-white shadow-lg w-8 h-8" />
                 </Carousel>
               </div>
 
               {/* Miniaturas */}
               <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
                 {getProductImages().map((image, index) => (
-                  <button
+                  <div
                     key={index}
-                    className="flex-shrink-0 w-12 h-16 rounded border-2 border-gray-200 hover:border-purple-500 overflow-hidden"
-                    onClick={() => handleImageClick(index)}
+                    className="flex-shrink-0 w-12 h-16 rounded border-2 border-gray-200 overflow-hidden"
                   >
                     <img
                       src={image}
                       alt={`Miniatura ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
-                  </button>
+                  </div>
                 ))}
               </div>
             </div>
 
-            {/* Informações - 2/3 do espaço */}
-            <div className="lg:col-span-2 space-y-6">
+            {/* Informações - Full width on mobile, 2/3 on desktop */}
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               
               {/* Preço e ações */}
               <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100">
@@ -193,25 +184,22 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   <Sparkles className="w-4 h-4 text-purple-600" />
                   💰 Oferta especial
                 </div>
-                <div className="text-3xl font-bold text-red-600 mb-4">
+                <div className="text-2xl md:text-3xl font-bold text-red-600 mb-4">
                   {formatPrice(product.valor)}
                 </div>
                 
-                <div className="flex gap-3 flex-wrap">
-                  <Button
-                    variant="outline" 
+                <div className="flex gap-2 md:gap-3 flex-wrap">
+                  <FavoriteButton 
+                    productId={product.id}
                     className="border-red-300 text-red-600 hover:bg-red-50 font-medium"
-                  >
-                    <Heart className="w-4 h-4 mr-2" />
-                    Favoritar
-                  </Button>
+                  />
                   <ShareButton 
                     productName={product.produto}
                     productLink={product.link}
                   />
                   <Button
                     onClick={handleBuyClick}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg text-sm md:text-base"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     Comprar Agora
@@ -301,18 +289,18 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
               {/* Related Products */}
               {relatedProducts.length > 0 && (
-                <div className="mt-8">
+                <div className="mt-6 md:mt-8">
                   <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-purple-600" />
                     Produtos Relacionados
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                     {relatedProducts.map((relatedProduct) => (
                       <div key={relatedProduct.id} className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-shadow cursor-pointer">
                         <img 
                           src={relatedProduct.imagem1} 
                           alt={relatedProduct.produto}
-                          className="w-full h-24 object-cover rounded mb-2"
+                          className="w-full h-20 md:h-24 object-cover rounded mb-2"
                         />
                         <h4 className="text-xs font-medium text-gray-900 line-clamp-2 mb-1">
                           {relatedProduct.produto}
@@ -329,14 +317,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      <ImageZoomModal
-        isOpen={isZoomOpen}
-        onClose={() => setIsZoomOpen(false)}
-        images={getProductImages()}
-        currentIndex={selectedImageIndex}
-        productName={product.produto}
-      />
 
       {product.video && (
         <ProductVideoModal
