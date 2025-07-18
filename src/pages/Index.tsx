@@ -406,7 +406,7 @@ const Index = () => {
         );
       })}
 
-      {/* Featured Products Carousel with Toggle */}
+      {/* Featured Products Carousel with Toggle - CARDS MENORES */}
       <section className="px-4 md:px-6 py-8 md:py-12 bg-white/10 backdrop-blur-sm animate-fade-in">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
@@ -467,19 +467,20 @@ const Index = () => {
             </>
           ) : (
             <>
+              {/* CAROUSEL COM CARDS COMPACTOS - ALTERAÇÃO PRINCIPAL */}
               <Carousel className="w-full animate-scale-in mb-6">
                 <CarouselContent className="-ml-2 md:-ml-3">
                   {featuredProducts.map((product, index) => (
                     <CarouselItem 
                       key={product.id} 
-                      className="pl-2 md:pl-3 basis-3/4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 animate-fade-in"
+                      className="pl-2 md:pl-3 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/5 animate-fade-in"
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <ProductCard 
                         product={product} 
                         showBadge={true}
                         badgeText="MAIS PROCURADO"
-                        compact={false}
+                        compact={true}
                       />
                     </CarouselItem>
                   ))}
