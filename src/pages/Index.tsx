@@ -124,12 +124,14 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Video Feed */}
-      <VideoFeed 
-        product={featuredProducts[0]} 
-        isActive={true} 
-        onBuy={() => console.log('Buy clicked')} 
-      />
+      {/* Video Feed - Only render if we have products */}
+      {featuredProducts.length > 0 && featuredProducts[0] && (
+        <VideoFeed 
+          product={featuredProducts[0]} 
+          isActive={true} 
+          onBuy={() => console.log('Buy clicked')} 
+        />
+      )}
       
       {/* Tab Navigation */}
       <TabNavigation 
