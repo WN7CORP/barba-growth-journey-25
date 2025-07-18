@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { X, ShoppingCart, Heart, Star, Play, Info } from 'lucide-react';
+import { X, ShoppingCart, Heart, Star, Play, Info, Sparkles } from 'lucide-react';
 import { ImageZoomModal } from '@/components/ImageZoomModal';
 import { ProductVideoModal } from '@/components/ProductVideoModal';
+import { ProductBreadcrumb } from '@/components/ProductBreadcrumb';
+import { ShareButton } from '@/components/ShareButton';
+import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
   id: number;
@@ -38,12 +42,35 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+
+  useEffect(() => {
+    if (isOpen && product.categoria) {
+      fetchRelatedProducts();
+    }
+  }, [isOpen, product.categoria]);
+
+  const fetchRelatedProducts = async () => {
+    try {
+      // @ts-ignore - Bypass TypeScript for table name
+      const { data } = await (supabase as any)
+        .from('MUNDODODIREITO')
+        .select('*')
+        .eq('categoria', product.categoria)
+        .neq('id', product.id)
+        .limit(4);
+      
+      setRelatedProducts(data || []);
+    } catch (error) {
+      console.error('Error fetching related products:', error);
+    }
+  };
 
   const getProductImages = () => {
     return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
   };
 
-  const formatPrice = (price: string) => {
+  const formatPrice = (price: string | null) => {
     if (!price) {
       return 'Preço não disponível';
     }
@@ -70,40 +97,51 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
     window.open(product.link, '_blank');
   };
 
+  // Simulate rating
+  const getSimulatedRating = (productId: number) => {
+    const ratings = [4.2, 4.5, 4.8, 4.3, 4.7, 4.1, 4.9, 4.4, 4.6, 4.0];
+    return ratings[productId % ratings.length];
+  };
+
+  const rating = getSimulatedRating(product.id);
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl w-[95vw] max-h-[90vh] overflow-hidden p-0 bg-white">
-          {/* Header compacto */}
-          <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white p-3 flex items-center justify-between">
-            <div className="flex-1 min-w-0 pr-4">
-              <h2 className="text-lg font-bold line-clamp-1">
-                {product.produto}
-              </h2>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge className="bg-white/20 text-white border-white/30 text-xs">
-                  {product.categoria}
-                </Badge>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 text-yellow-300 fill-current" />
-                  <span className="text-xs">4.8</span>
+        <DialogContent className="max-w-6xl w-[95vw] max-h-[90vh] overflow-hidden p-0 bg-white">
+          {/* Header with breadcrumb */}
+          <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white">
+            <div className="flex items-center justify-between p-3">
+              <div className="flex-1 pr-4">
+                <h2 className="text-lg font-bold line-clamp-1 mb-1">
+                  {product.produto}
+                </h2>
+                <div className="flex items-center gap-2">
+                  <Badge className="bg-white/20 text-white border-white/30 text-xs">
+                    {product.categoria}
+                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 text-yellow-300 fill-current" />
+                    <span className="text-xs">{rating.toFixed(1)}</span>
+                  </div>
                 </div>
               </div>
+              <Button
+                onClick={onClose}
+                variant="ghost" 
+                size="sm"
+                className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-10 h-10 p-0 flex-shrink-0"
+              >
+                <X className="w-5 h-5" />
+              </Button>
             </div>
-            <Button
-              onClick={onClose}
-              variant="ghost" 
-              size="sm"
-              className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-10 h-10 p-0 flex-shrink-0"
-            >
-              <X className="w-5 h-5" />
-            </Button>
+            <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
           </div>
 
-          {/* Layout principal - grid responsivo */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 p-4 overflow-y-auto max-h-[calc(90vh-80px)]">
+          {/* Layout principal */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
             
-            {/* Galeria compacta - 1/3 do espaço */}
+            {/* Galeria - 1/3 do espaço */}
             <div className="lg:col-span-1">
               <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner" style={{ aspectRatio: '2/3' }}>
                 <Carousel className="w-full h-full">
@@ -128,12 +166,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </Carousel>
               </div>
 
-              {/* Miniaturas compactas */}
+              {/* Miniaturas */}
               <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
                 {getProductImages().map((image, index) => (
                   <button
                     key={index}
-                    className="flex-shrink-0 w-10 h-10 rounded border-2 border-gray-200 hover:border-purple-500 overflow-hidden"
+                    className="flex-shrink-0 w-12 h-16 rounded border-2 border-gray-200 hover:border-purple-500 overflow-hidden"
                     onClick={() => handleImageClick(index)}
                   >
                     <img
@@ -147,26 +185,33 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
 
             {/* Informações - 2/3 do espaço */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-6">
               
-              {/* Preço e compra */}
+              {/* Preço e ações */}
               <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100">
-                <div className="text-sm text-gray-600 mb-1">💰 Oferta especial</div>
-                <div className="text-2xl font-bold text-red-600 mb-3">
+                <div className="text-sm text-gray-600 mb-1 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-purple-600" />
+                  💰 Oferta especial
+                </div>
+                <div className="text-3xl font-bold text-red-600 mb-4">
                   {formatPrice(product.valor)}
                 </div>
                 
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <Button
                     variant="outline" 
-                    className="flex-1 border-red-300 text-red-600 hover:bg-red-50 font-medium"
+                    className="border-red-300 text-red-600 hover:bg-red-50 font-medium"
                   >
                     <Heart className="w-4 h-4 mr-2" />
                     Favoritar
                   </Button>
+                  <ShareButton 
+                    productName={product.produto}
+                    productLink={product.link}
+                  />
                   <Button
                     onClick={handleBuyClick}
-                    className="flex-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg"
+                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg"
                   >
                     <ShoppingCart className="w-4 h-4 mr-2" />
                     Comprar Agora
@@ -253,6 +298,33 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   </Card>
                 </TabsContent>
               </Tabs>
+
+              {/* Related Products */}
+              {relatedProducts.length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-600" />
+                    Produtos Relacionados
+                  </h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {relatedProducts.map((relatedProduct) => (
+                      <div key={relatedProduct.id} className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-shadow cursor-pointer">
+                        <img 
+                          src={relatedProduct.imagem1} 
+                          alt={relatedProduct.produto}
+                          className="w-full h-24 object-cover rounded mb-2"
+                        />
+                        <h4 className="text-xs font-medium text-gray-900 line-clamp-2 mb-1">
+                          {relatedProduct.produto}
+                        </h4>
+                        <p className="text-sm font-bold text-red-600">
+                          {formatPrice(relatedProduct.valor)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </DialogContent>
