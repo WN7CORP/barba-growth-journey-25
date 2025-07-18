@@ -2,8 +2,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Images, ShoppingCart, Expand, Play, X } from 'lucide-react';
-import { ImageZoomModal } from '@/components/ImageZoomModal';
+import { Images, ShoppingCart, Play, X } from 'lucide-react';
 import { ProductVideoModal } from '@/components/ProductVideoModal';
 
 interface ProductPhotosModalProps {
@@ -22,14 +21,7 @@ export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
   videoUrl
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
-  const handleImageClick = (index: number) => {
-    setSelectedImageIndex(index);
-    setIsZoomOpen(true);
-  };
 
   const handleBuyClick = () => {
     window.open(productLink, '_blank');
@@ -102,30 +94,19 @@ export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
               </Button>
           </div>
           
-          {/* Grid de imagens com scroll melhorado */}
+          {/* Grid de imagens - sem funcionalidade de zoom */}
           <div className="p-3 sm:p-4 overflow-y-auto" style={{ maxHeight: 'calc(90vh - 180px)' }}>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
               {images.map((image, index) => (
                 <div 
                   key={index} 
-                  className="relative group cursor-pointer aspect-square rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300" 
-                  onClick={() => handleImageClick(index)}
+                  className="relative aspect-square rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300" 
                 >
                   <img 
                     src={image} 
                     alt={`${productName} - ${index + 1}`} 
-                    className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-cover"
                   />
-                  
-                  {/* Overlay com efeito hover */}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center gap-2">
-                      <Expand className="w-6 h-6 text-white drop-shadow-lg" />
-                      <span className="text-xs text-white font-medium bg-black/50 px-2 py-1 rounded">
-                        Ampliar
-                      </span>
-                    </div>
-                  </div>
                   
                   {/* Indicador de número da imagem */}
                   <div className="absolute top-1 left-1 bg-black/70 text-white text-xs px-2 py-1 rounded-md opacity-90">
@@ -137,14 +118,6 @@ export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      <ImageZoomModal
-        isOpen={isZoomOpen}
-        onClose={() => setIsZoomOpen(false)}
-        images={images}
-        currentIndex={selectedImageIndex}
-        productName={productName}
-      />
 
       {videoUrl && (
         <ProductVideoModal

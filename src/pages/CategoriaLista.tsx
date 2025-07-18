@@ -95,8 +95,18 @@ const CategoriaLista = () => {
     setSearchTerm(term);
   };
 
-  const handlePriceFilter = (range: [number, number]) => {
+  // Fix the price filter function to match PriceFilter component signature
+  const handlePriceFilter = (minPrice: number, maxPrice: number) => {
+    setPriceRange([minPrice, maxPrice]);
+  };
+
+  // Fix the price range handler for local state
+  const handlePriceRangeChange = (range: [number, number]) => {
     setPriceRange(range);
+  };
+
+  const handlePriceFilterClear = () => {
+    setPriceRange([0, 1000]);
   };
 
   const getCategoryTitle = () => {
@@ -169,10 +179,8 @@ const CategoriaLista = () => {
           {showPriceFilter && (
             <div className="mt-4 animate-fade-in">
               <PriceFilter
-                onPriceChange={handlePriceFilter}
-                min={0}
-                max={1000}
-                step={50}
+                onFilter={handlePriceFilter}
+                onClear={handlePriceFilterClear}
               />
             </div>
           )}
@@ -200,13 +208,26 @@ const CategoriaLista = () => {
           )}
         </div>
 
-        {/* Products Grid */}
+        {/* Products Grid - using only existing props */}
         <ProductGrid 
           products={filteredProducts} 
           loading={loading}
-          emptyMessage={`Nenhum produto encontrado${searchTerm ? ` para "${searchTerm}"` : ''}`}
-          emptyDescription="Tente ajustar os filtros ou buscar por outros termos"
         />
+        
+        {/* Custom empty state when no products found */}
+        {!loading && filteredProducts.length === 0 && (
+          <div className="text-center py-16 animate-fade-in">
+            <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
+              <div className="w-16 h-16 text-white/50">📦</div>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              Nenhum produto encontrado{searchTerm ? ` para "${searchTerm}"` : ''}
+            </h2>
+            <p className="text-white/80">
+              Tente ajustar os filtros ou buscar por outros termos
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
