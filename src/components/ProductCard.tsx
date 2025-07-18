@@ -1,6 +1,6 @@
 
 import React, { useState, memo, useCallback } from 'react';
-import { Star, Play, BookOpen, Heart, ShoppingBag, Eye } from 'lucide-react';
+import { Star, Play, Scale, BookOpen, GraduationCap, ShoppingBag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +30,6 @@ interface ProductCardProps {
   showBadge?: boolean;
   badgeText?: string;
   compact?: boolean;
-  featured?: boolean;
   selectable?: boolean;
   selected?: boolean;
   onToggle?: (product: Product) => void;
@@ -40,9 +39,8 @@ interface ProductCardProps {
 const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   showBadge = false,
-  badgeText = "DESTAQUE",
+  badgeText = "MAIS PROCURADO",
   compact = false,
-  featured = false,
   selectable = false,
   selected = false,
   onToggle,
@@ -55,23 +53,27 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const formatPrice = useCallback((price: string) => {
-    // Extract only the numeric value and format it properly
-    const numericPrice = price.replace(/[^\d,]/g, '').replace(',', '.');
-    const formatted = parseFloat(numericPrice).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    });
-    return formatted;
+    if (price.includes('R$')) {
+      return price;
+    }
+    return `R$ ${price}`;
+  }, []);
+
+  const getCategoryIcon = useCallback((category: string) => {
+    if (category.includes('Livros') || category.includes('Códigos')) {
+      return BookOpen;
+    }
+    if (category.includes('Estudo') || category.includes('Preparatórios')) {
+      return GraduationCap;
+    }
+    return Scale;
   }, []);
 
   const handleCardClick = useCallback((e: React.MouseEvent) => {
-    // Prevent modal opening when clicking interactive elements
-    if ((e.target as HTMLElement).closest('button') || 
-        (e.target as HTMLElement).closest('[role="button"]') || 
-        (e.target as HTMLElement).closest('.carousel-nav')) {
+    // Evitar abrir o modal se clicar em botões específicos
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[role="button"]') || (e.target as HTMLElement).closest('.carousel-nav')) {
       return;
     }
-    
     if (selectable && onToggle) {
       onToggle(product);
     } else {
@@ -79,164 +81,124 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     }
   }, [selectable, onToggle, product]);
 
-  const handleViewMore = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsDetailModalOpen(true);
-  }, []);
-
   const handleBuyClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     window.open(product.link, '_blank');
   }, [product.link]);
 
   const images = getProductImages(product);
-  const cardClasses = `
-    group relative overflow-hidden transition-all duration-500 cursor-pointer
-    ${featured ? 'card-featured' : 'card-elegant'}
-    ${compact ? 'h-auto' : 'h-full'}
-    ${selected ? 'ring-2 ring-gold shadow-gold/20 shadow-lg' : ''}
-    hover:scale-[1.02] hover:shadow-hover
-  `;
+  const CategoryIcon = getCategoryIcon(product.categoria);
 
   return (
     <>
       <Card 
         id={`product-${product.id}`}
         style={style}
-        className={cardClasses}
+        className={`
+          overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
+          bg-white border-0 shadow-xl group animate-fade-in cursor-pointer
+          ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
+        `}
         onClick={handleCardClick}
       >
-        {/* Image Container */}
         <div className="relative">
           <Carousel className="w-full">
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className={`overflow-hidden ${compact ? 'aspect-[3/4]' : 'aspect-[3/4.2]'}`}>
-                    <LazyImage 
-                      src={image} 
-                      alt={`${product.produto} - Imagem ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
+          <div className="aspect-[3/4] overflow-hidden">
+                     <LazyImage 
+                       src={image} 
+                       alt={`${product.produto} - ${index + 1}`}
+                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                     />
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="carousel-nav left-2 bg-white/90 hover:bg-white shadow-card border-0 w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity" />
-            <CarouselNext className="carousel-nav right-2 bg-white/90 hover:bg-white shadow-card border-0 w-7 h-7 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <CarouselPrevious className={`carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
+            <CarouselNext className={`carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
           </Carousel>
           
-          {/* Badges and Icons Overlay */}
-          <div className="absolute inset-0 pointer-events-none">
-            {/* Video indicator */}
-            {product.video && (
-              <div className="absolute top-3 right-3 pointer-events-auto">
-                <div className="bg-red-500/90 backdrop-blur-sm rounded-full p-1.5 shadow-lg">
-                  <Play className="w-3 h-3 text-white" fill="currentColor" />
-                </div>
+          {product.video && (
+            <div className={`absolute ${compact ? 'top-1 right-1' : 'top-2 right-2'}`}>
+              <div className="bg-red-600/90 rounded-full p-1.5 shadow-lg animate-pulse">
+                <Play className="w-3 h-3 text-white" />
               </div>
-            )}
-            
-            {/* Feature badge */}
-            {showBadge && (
-              <div className="absolute top-3 left-3">
-                <Badge className="bg-gold text-primary font-semibold text-xs px-2 py-1 shadow-lg border-0">
-                  ✨ {badgeText}
-                </Badge>
-              </div>
-            )}
+            </div>
+          )}
+          
+          {showBadge && (
+            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+              <Badge className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-xs animate-bounce shadow-lg">
+                {badgeText}
+              </Badge>
+            </div>
+          )}
 
-            {/* Selection indicator */}
-            {selectable && (
-              <div className="absolute top-3 left-3 pointer-events-auto">
-                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shadow-lg ${
-                  selected ? 'bg-gold border-gold' : 'bg-white/90 border-muted-foreground/30'
-                }`}>
-                  {selected && <div className="w-2 h-2 bg-primary rounded-full"></div>}
-                </div>
-              </div>
-            )}
+          {product.categoria && !showBadge && compact && (
+            <div className="absolute bottom-1 left-1">
+              <Badge variant="secondary" className="text-xs bg-white/95 px-1.5 py-0.5 flex items-center gap-1 shadow-md">
+                <CategoryIcon className="w-3 h-3" />
+                <span className="truncate max-w-16">{product.categoria.split(' ')[0]}</span>
+              </Badge>
+            </div>
+          )}
 
-            {/* Favorite button */}
-            {!showBadge && !selectable && (
-              <div className="absolute top-3 left-3 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity">
-                <FavoriteButton productId={product.id} showText={false} />
+          {selectable && (
+            <div className="absolute top-2 left-2">
+              <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shadow-lg ${
+                selected ? 'bg-purple-600 border-purple-600' : 'bg-white border-gray-300'
+              }`}>
+                {selected && <div className="w-2 h-2 bg-white rounded-full"></div>}
               </div>
-            )}
-          </div>
+            </div>
+          )}
+
+          {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
+          {!showBadge && !selectable && (
+            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+              <FavoriteButton productId={product.id} showText={false} />
+            </div>
+          )}
         </div>
 
-        {/* Content */}
-        <CardContent className={`p-4 ${compact ? 'space-y-3' : 'space-y-4'}`}>
-          {/* Title */}
-          <h3 className={`font-semibold text-foreground line-clamp-2 hover:text-accent transition-colors leading-tight ${
+        <CardContent className={compact ? "p-3" : "p-4"}>
+          <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
             compact ? 'text-sm' : 'text-base'
           }`}>
             {product.produto}
           </h3>
           
-          {/* Category */}
-          {product.categoria && !compact && (
-            <div className="text-xs text-muted-foreground font-medium">
-              {product.categoria}
-            </div>
-          )}
-          
-          {/* Price and Rating Row */}
-          <div className="flex items-center justify-between">
-            <div className={`font-bold text-accent ${compact ? 'text-base' : 'text-lg'}`}>
-              {formatPrice(product.valor)}
+          <div className="flex items-center justify-between mb-3">
+            <div className={`font-bold text-red-600 ${compact ? 'text-sm' : 'text-lg'}`}>
+              Por menos de {formatPrice(product.valor)}
             </div>
             <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-gold fill-current" />
-              <span className="text-sm text-muted-foreground font-medium">4.8</span>
+              <Star className="w-4 h-4 text-amber-500 fill-current" />
+              <span className="text-sm text-gray-600 font-medium">4.9</span>
             </div>
           </div>
           
-          {/* Action Buttons */}
           <div className="space-y-2">
-            {/* Favorite button for badge/selectable modes */}
+            {/* Sempre mostrar botão de favoritar no conteúdo do card se houver badge ou seleção */}
             {(showBadge || selectable) && (
-              <div className="flex justify-start">
+              <div className="flex gap-1 mb-2">
                 <FavoriteButton productId={product.id} />
               </div>
             )}
             
-            {/* Primary Actions */}
-            <div className={`flex gap-2 ${compact ? 'flex-col' : 'flex-row'}`}>
-              <Button 
-                size="sm" 
-                variant="outline"
-                className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground border-border hover:border-muted-foreground/30 transition-all duration-200 hover:scale-[1.02]"
-                onClick={handleViewMore}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Ver Detalhes
-              </Button>
-              
-              {!compact && (
-                <Button 
-                  size="sm"
-                  className="flex-1 btn-accent shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
-                  onClick={handleBuyClick}
-                >
-                  <ShoppingBag className="w-4 h-4 mr-2" />
-                  Comprar
-                </Button>
-              )}
-            </div>
-            
-            {/* Compact mode buy button */}
-            {compact && (
-              <Button 
-                size="sm"
-                className="w-full btn-accent shadow-md hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
-                onClick={handleBuyClick}
-              >
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                Comprar Agora
-              </Button>
-            )}
+            <Button 
+              size="sm" 
+              variant="outline"
+              className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 ${
+                compact ? 'py-2 text-sm' : 'py-3 text-base'
+              }`}
+              onClick={handleCardClick}
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Ver mais
+            </Button>
           </div>
         </CardContent>
       </Card>

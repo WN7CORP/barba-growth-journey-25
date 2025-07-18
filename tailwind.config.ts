@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -53,41 +52,21 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Premium color system
-				gold: {
-					DEFAULT: 'hsl(var(--gold))',
-					dark: 'hsl(var(--gold-dark))',
-					light: 'hsl(var(--gold-light))'
-				},
-				premium: {
-					dark: 'hsl(var(--premium-dark))',
-					medium: 'hsl(var(--premium-medium))',
-					light: 'hsl(var(--premium-light))',
-					accent: 'hsl(var(--premium-accent))'
-				},
-				book: {
-					spine: 'hsl(var(--book-spine))',
-					page: 'hsl(var(--book-page))',
-					text: 'hsl(var(--book-text))',
-					accent: 'hsl(var(--book-accent))'
+				sidebar: {
+					DEFAULT: 'hsl(var(--sidebar-background))',
+					foreground: 'hsl(var(--sidebar-foreground))',
+					primary: 'hsl(var(--sidebar-primary))',
+					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
+					accent: 'hsl(var(--sidebar-accent))',
+					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
+					border: 'hsl(var(--sidebar-border))',
+					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
-			},
-			fontFamily: {
-				sans: ['Inter', 'system-ui', 'sans-serif'],
-				serif: ['Playfair Display', 'serif'],
-				display: ['Playfair Display', 'serif']
-			},
-			fontSize: {
-				'display-2xl': ['4.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-				'display-xl': ['3.75rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-				'display-lg': ['3rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-				'display-md': ['2.25rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
-				'display-sm': ['1.875rem', { lineHeight: '1.3', letterSpacing: '-0.02em' }],
 			},
 			keyframes: {
 				'accordion-down': {
@@ -105,58 +84,11 @@ export default {
 					to: {
 						height: '0'
 					}
-				},
-				'fade-in-up': {
-					'0%': {
-						opacity: '0',
-						transform: 'translateY(24px)'
-					},
-					'100%': {
-						opacity: '1',
-						transform: 'translateY(0)'
-					}
-				},
-				'scale-in': {
-					'0%': {
-						opacity: '0',
-						transform: 'scale(0.95)'
-					},
-					'100%': {
-						opacity: '1',
-						transform: 'scale(1)'
-					}
-				},
-				'slide-in': {
-					'0%': {
-						opacity: '0',
-						transform: 'translateX(-24px)'
-					},
-					'100%': {
-						opacity: '1',
-						transform: 'translateX(0)'
-					}
-				},
-				'shimmer': {
-					'0%': {
-						backgroundPosition: '-200% 0'
-					},
-					'100%': {
-						backgroundPosition: '200% 0'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in-up': 'fade-in-up 0.6s ease-out',
-				'scale-in': 'scale-in 0.4s ease-out',
-				'slide-in': 'slide-in 0.5s ease-out',
-				'shimmer': 'shimmer 2s infinite'
-			},
-			boxShadow: {
-				'elegant': 'var(--shadow-elegant)',
-				'card': 'var(--shadow-card)',
-				'hover': 'var(--shadow-hover)'
+				'accordion-up': 'accordion-up 0.2s ease-out'
 			}
 		}
 	},
