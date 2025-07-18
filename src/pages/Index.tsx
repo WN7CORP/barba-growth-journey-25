@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase } from 'lucide-react';
@@ -51,11 +50,8 @@ const Index = () => {
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<string, string>>({});
   const [priceFilter, setPriceFilter] = useState<{ min: number; max: number }>({ min: 0, max: 1000 });
-
-  // Categorias carregadas dinamicamente da base de dados
   const [legalCategories, setLegalCategories] = useState<string[]>([]);
 
-  // Function to shuffle array - sempre randomizar
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -65,7 +61,6 @@ const Index = () => {
     return shuffled;
   };
 
-  // Parse price from string to number
   const parsePrice = (priceString: string): number => {
     const cleanPrice = priceString.replace(/[^\d,]/g, '').replace(',', '.');
     return parseFloat(cleanPrice) || 0;
@@ -85,12 +80,10 @@ const Index = () => {
     filterProducts();
   }, [selectedCategory, filteredProducts, searchTerm, sortBy, sortOrder]);
 
-  // Apply price filter whenever priceFilter changes
   useEffect(() => {
     applyPriceFilter();
   }, [products, priceFilter]);
 
-  // Auto-rotate featured products by category every 15 seconds - only when not viewing specific category
   useEffect(() => {
     if (legalCategories.length > 0 && products.length > 0 && !categoryFromUrl) {
       const interval = setInterval(() => {
@@ -123,22 +116,18 @@ const Index = () => {
         product && product.produto && product.valor && product.imagem1
       ) as Product[];
       
-      // SEMPRE randomizar produtos a cada carregamento
       let processedProducts = shuffleArray(legalProducts);
       
       setProducts(processedProducts);
       
-      // Set initial featured products (first 8 randomizados)
       const initialFeatured = shuffleArray(processedProducts).slice(0, 8);
       setFeaturedProducts(initialFeatured);
 
-      // Buscar categorias reais da base de dados
       const uniqueCategories = [...new Set(legalProducts.map(p => p.categoria).filter(Boolean))];
       setCategories(['todas', ...uniqueCategories]);
 
       setLegalCategories(uniqueCategories);
       
-      // Set initial featured category
       if (legalCategories.length > 0) {
         setCurrentFeaturedCategory('Destaques Jurídicos');
       }
@@ -147,25 +136,6 @@ const Index = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapToLegalCategory = (originalCategory: string): string => {
-    const categoryMap: Record<string, string> = {
-      'Beleza e Cuidados Pessoais': 'Vestimentas Jurídicas',
-      'Casa e Decoração': 'Acessórios Profissionais',
-      'Diversão e Familia': 'Cursos e Preparatórios',
-      'Estilo e Moda': 'Vestimentas Jurídicas',
-      'Tecnologia e Acessórios': 'Materiais de Estudo'
-    };
-
-    // Se contém palavras relacionadas a livros/estudos
-    if (originalCategory.toLowerCase().includes('book') || 
-        originalCategory.toLowerCase().includes('livro') ||
-        originalCategory.toLowerCase().includes('estudo')) {
-      return 'Livros de Direito';
-    }
-
-    return categoryMap[originalCategory] || 'Livros de Direito';
   };
 
   const applyPriceFilter = () => {
@@ -189,7 +159,6 @@ const Index = () => {
       );
     }
 
-    // Aplicar ordenação
     filtered.sort((a, b) => {
       if (sortBy === 'nome') {
         const comparison = a.produto.localeCompare(b.produto);
@@ -217,7 +186,7 @@ const Index = () => {
     const productElement = document.getElementById(`product-${productId}`);
     if (productElement) {
       productElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setSearchTerm(''); // Clear search to hide preview
+      setSearchTerm('');
     }
   };
 
@@ -285,20 +254,17 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+      <div className="min-h-screen bg-background">
         <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-6">
-            <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
-            <ProductGrid loading={true} products={[]} />
-          </div>
+        <div className="container-elegant py-12">
+          <ProductGrid loading={true} products={[]} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+    <div className="min-h-screen bg-background">
       <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
       
       {/* Search Preview */}
@@ -312,23 +278,23 @@ const Index = () => {
         />
       )}
 
-      {/* Novidades Carousel */}
+      {/* Category Carousel */}
       <CategoryCarousel 
         products={filteredProducts}
         onProductClick={handleProductClick}
       />
       
-      {/* Category Quick Access Buttons */}
-      <section className="px-4 py-2 animate-fade-in">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+      {/* Quick Category Navigation */}
+      <section className="border-b border-border bg-card/50">
+        <div className="container-elegant py-4">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               size="sm"
               variant="outline"
               onClick={() => navigate('/categoria-lista?categoria=todas&tipo=categoria')}
-              className="whitespace-nowrap transition-all duration-300 hover:scale-105 bg-white/20 text-white border-white/30 hover:bg-white/30 flex items-center gap-2"
+              className="whitespace-nowrap bg-secondary hover:bg-secondary/80 border-border text-secondary-foreground"
             >
-              <Scale className="w-4 h-4" />
+              <Scale className="w-4 h-4 mr-2" />
               Todas as Áreas
             </Button>
             {legalCategories.slice(0, 6).map(category => {
@@ -339,9 +305,9 @@ const Index = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => navigate(`/categoria-lista?categoria=${encodeURIComponent(category)}&tipo=categoria`)}
-                  className="whitespace-nowrap transition-all duration-300 hover:scale-105 bg-white/20 text-white border-white/30 hover:bg-white/30 flex items-center gap-2"
+                  className="whitespace-nowrap bg-secondary hover:bg-secondary/80 border-border text-secondary-foreground"
                 >
-                  <IconComponent className="w-4 h-4" />
+                  <IconComponent className="w-4 h-4 mr-2" />
                   {category}
                 </Button>
               );
@@ -353,7 +319,7 @@ const Index = () => {
       {/* Hero Section */}
       <HeroSection productsCount={filteredProducts.length} />
 
-      {/* Category Product Carousels - show all categories when not in AI mode */}
+      {/* Category Product Sections */}
       {!showingAI && legalCategories.map((category, index) => {
         const categoryProducts = getCategoryProducts(category);
         const IconComponent = getCategoryIcon(category);
@@ -361,35 +327,38 @@ const Index = () => {
         if (categoryProducts.length === 0) return null;
         
         return (
-          <section key={category} className="px-4 md:px-6 py-4 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-            <div className="max-w-7xl mx-auto">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-purple-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                    <IconComponent className="w-4 h-4 text-purple-300" />
+          <section 
+            key={category} 
+            className="py-12 border-b border-border/50 last:border-b-0"
+            style={{ animationDelay: `${index * 0.1}s` }}
+          >
+            <div className="container-elegant">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center">
+                    <IconComponent className="w-6 h-6 text-accent" />
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-white">{category}</h3>
-                    <p className="text-xs text-white/70">{categoryProducts.length} produtos disponíveis</p>
+                    <h3 className="text-display-sm font-display text-foreground">{category}</h3>
+                    <p className="text-muted-foreground">{categoryProducts.length} livros disponíveis</p>
                   </div>
                 </div>
                 <Button
-                  size="sm"
                   variant="outline"
                   onClick={() => navigate(`/categoria-lista?categoria=${encodeURIComponent(category)}&tipo=categoria`)}
-                  className="bg-white/20 text-white border-white/30 hover:bg-white/30 text-xs px-3 py-1 h-auto"
+                  className="hover-gold"
                 >
                   Ver Todos
-                  <ArrowRight className="w-3 h-3 ml-1" />
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
               
               <Carousel className="w-full">
-                <CarouselContent className="-ml-2 md:-ml-3">
+                <CarouselContent className="-ml-4">
                   {categoryProducts.map((product) => (
                     <CarouselItem 
                       key={product.id} 
-                      className="pl-2 md:pl-3 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
+                      className="pl-4 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 xl:basis-1/6"
                     >
                       <ProductCard 
                         product={product} 
@@ -398,39 +367,39 @@ const Index = () => {
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-2 md:left-4 bg-white/90 hover:bg-white border-purple-200 w-6 h-6" />
-                <CarouselNext className="right-2 md:right-4 bg-white/90 hover:bg-white border-purple-200 w-6 h-6" />
+                <CarouselPrevious className="left-4 bg-card hover:bg-card/80 border-border shadow-card" />
+                <CarouselNext className="right-4 bg-card hover:bg-card/80 border-border shadow-card" />
               </Carousel>
             </div>
           </section>
         );
       })}
 
-      {/* Featured Products Carousel with Toggle */}
-      <section className="px-4 md:px-6 py-8 md:py-12 bg-white/10 backdrop-blur-sm animate-fade-in">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-8">
+      {/* Featured Products Section */}
+      <section className="py-16 bg-gradient-to-br from-card to-secondary/30">
+        <div className="container-elegant">
+          <div className="text-center mb-12">
             <TabNavigation 
               showingAI={showingAI}
               onTabChange={handleTabChange}
             />
             
             {showingAI ? (
-              <div className="prose prose-invert max-w-none">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
-                  ⚖️ Consultor Jurídico IA
+              <div className="max-w-2xl mx-auto space-y-4">
+                <h2 className="text-display-md font-display text-foreground">
+                  🤖 Consultor Jurídico IA
                 </h2>
-                <div className="text-base text-white/90 animate-slide-in-right space-y-2">
+                <div className="text-muted-foreground space-y-2">
                   <p><strong>Selecione até 5 produtos</strong> e nossa <strong>IA especializada</strong> irá recomendar o melhor para sua carreira jurídica</p>
                   <p className="text-sm">✨ <em>Análise personalizada baseada em sua área de atuação</em></p>
                 </div>
               </div>
             ) : (
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
+              <div className="max-w-2xl mx-auto space-y-4">
+                <h2 className="text-display-md font-display text-foreground">
                   📚 Mais Procurados pelos Juristas
                 </h2>
-                <p className="text-base text-white/80 animate-slide-in-right">
+                <p className="text-muted-foreground">
                   {currentFeaturedCategory && currentFeaturedCategory !== 'Destaques Jurídicos' 
                     ? `Os favoritos em ${currentFeaturedCategory}` 
                     : 'Os materiais mais utilizados pelos profissionais do direito'}
@@ -441,12 +410,12 @@ const Index = () => {
 
           {showingAI ? (
             <>
-              <div className="max-w-md mx-auto mb-6 animate-scale-in">
+              <div className="max-w-md mx-auto mb-8">
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                  <SelectTrigger className="bg-card border-border">
                     <SelectValue placeholder="Selecione uma área do direito" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-300 z-50">
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="todas">Todas as Áreas</SelectItem>
                     {legalCategories.map(category => (
                       <SelectItem key={category} value={category}>
@@ -467,31 +436,32 @@ const Index = () => {
             </>
           ) : (
             <>
-              <Carousel className="w-full animate-scale-in mb-6">
-                <CarouselContent className="-ml-2 md:-ml-3">
+              <Carousel className="w-full mb-8">
+                <CarouselContent className="-ml-6">
                   {featuredProducts.map((product, index) => (
                     <CarouselItem 
                       key={product.id} 
-                      className="pl-2 md:pl-3 basis-3/4 md:basis-1/2 lg:basis-1/3 xl:basis-1/4 animate-fade-in"
+                      className="pl-6 basis-full sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       <ProductCard 
                         product={product} 
                         showBadge={true}
-                        badgeText="MAIS PROCURADO"
+                        badgeText="DESTAQUE"
+                        featured={true}
                         compact={false}
                       />
                     </CarouselItem>
                   ))}
                 </CarouselContent>
-                <CarouselPrevious className="left-2 md:left-4 bg-white/90 hover:bg-white border-amber-200" />
-                <CarouselNext className="right-2 md:right-4 bg-white/90 hover:bg-white border-amber-200" />
+                <CarouselPrevious className="left-4 bg-card hover:bg-card/80 border-border shadow-card" />
+                <CarouselNext className="right-4 bg-card hover:bg-card/80 border-border shadow-card" />
               </Carousel>
               
-              <div className="text-center animate-fade-in">
+              <div className="text-center">
                 <Button 
                   onClick={() => navigate('/categoria-lista?tipo=mais-vendidos')}
-                  className="bg-white text-blue-900 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105"
+                  className="btn-accent shadow-lg hover:shadow-xl"
                 >
                   Ver Mais Materiais Jurídicos
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -502,26 +472,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Category Filter and Products Grid - only show when not in AI mode */}
+      {/* Products Grid Section */}
       {!showingAI && (
-        <section className="px-4 md:px-6 py-8 md:py-12 animate-fade-in">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <div className="text-center flex-1">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
+        <section className="py-16">
+          <div className="container-elegant">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-display-md font-display text-foreground mb-2">
                   Explorar Biblioteca Jurídica
                 </h2>
-                <p className="text-base text-white/80 mb-4 animate-slide-in-right">
+                <p className="text-muted-foreground">
                   {searchTerm ? `Resultados para "${searchTerm}"` : 'Navegue por nossa coleção especializada em direito'}
                 </p>
               </div>
               
-              <div className="flex gap-2 animate-slide-in-right">
+              <div className="flex gap-2">
                 <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-                  <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
+                  <SelectTrigger className="bg-card border-border w-32">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-white border-gray-300 z-50">
+                  <SelectContent className="bg-card border-border">
                     <SelectItem value="nome">
                       <div className="flex items-center gap-2">
                         <SortAsc className="w-4 h-4" />
@@ -540,19 +510,19 @@ const Index = () => {
                   size="sm"
                   variant="outline"
                   onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                  className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+                  className="hover-gold"
                 >
                   {sortOrder === 'asc' ? '↑' : '↓'}
                 </Button>
               </div>
             </div>
 
-            <div className="max-w-md mx-auto mb-6 animate-scale-in">
+            <div className="max-w-md mx-auto mb-8">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="bg-white border-gray-300 text-gray-900">
+                <SelectTrigger className="bg-card border-border">
                   <SelectValue placeholder="Selecione uma área do direito" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border-gray-300 z-50">
+                <SelectContent className="bg-card border-border">
                   <SelectItem value="todas">Todas as Áreas do Direito</SelectItem>
                   {legalCategories.map(category => (
                     <SelectItem key={category} value={category}>
@@ -565,33 +535,11 @@ const Index = () => {
 
             <ProductGrid products={displayedProducts.slice(0, 24)} compact={true} />
 
-            {displayedProducts.length === 0 && (
-              <div className="text-center py-16 animate-fade-in">
-                <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-                  <Scale className="w-16 h-16 text-white/50" />
-                </div>
-                <h2 className="text-2xl font-bold text-white mb-4">
-                  Nenhum material encontrado
-                </h2>
-                <p className="text-white/80 mb-6">
-                  {searchTerm ? `Não encontramos materiais para "${searchTerm}"` : 'Não há materiais nesta categoria'}
-                </p>
-                {searchTerm && (
-                  <Button 
-                    onClick={() => setSearchTerm('')} 
-                    className="bg-white text-blue-900 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105"
-                  >
-                    Ver Todos os Materiais
-                  </Button>
-                )}
-              </div>
-            )}
-
             {displayedProducts.length > 24 && (
-              <div className="text-center mt-8 animate-fade-in">
+              <div className="text-center mt-12">
                 <Button 
                   onClick={() => navigate(`/categoria-lista?categoria=${selectedCategory}&tipo=categoria`)}
-                  className="bg-white text-blue-900 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105"
+                  className="btn-accent shadow-lg hover:shadow-xl"
                 >
                   Ver Todos os {displayedProducts.length} Materiais
                   <ArrowRight className="w-4 h-4 ml-2" />
@@ -602,24 +550,24 @@ const Index = () => {
         </section>
       )}
 
-      {/* CTA Section - only show when not in AI mode */}
+      {/* CTA Section */}
       {!showingAI && (
-        <section className="px-4 md:px-6 py-12 md:py-16 bg-gradient-to-r from-blue-800 via-indigo-800 to-blue-900 relative overflow-hidden animate-fade-in">
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
-            <div className="space-y-6">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-amber-500/20 rounded-3xl flex items-center justify-center mx-auto animate-bounce">
-                <Scale className="w-8 h-8 md:w-10 md:h-10 text-amber-300 animate-pulse" />
+        <section className="py-20 premium-gradient text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-black/10"></div>
+          <div className="container-elegant relative z-10">
+            <div className="max-w-3xl mx-auto text-center space-y-8">
+              <div className="w-20 h-20 bg-gold/20 rounded-3xl flex items-center justify-center mx-auto">
+                <Scale className="w-10 h-10 text-gold" />
               </div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 text-white animate-slide-in-left">
+              <h2 className="text-display-lg font-display text-balance">
                 Fortaleça sua Carreira Jurídica!
               </h2>
-              <p className="text-white/90 text-base md:text-lg max-w-2xl mx-auto leading-relaxed animate-slide-in-right">
+              <p className="text-lg text-white/90 max-w-2xl mx-auto leading-relaxed">
                 Descubra os melhores materiais jurídicos com preços especiais para advogados, estudantes e operadores do direito
               </p>
               <Button 
                 size="lg" 
-                className="bg-amber-500 text-blue-900 hover:bg-amber-400 py-4 px-8 font-bold text-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105" 
+                className="btn-gold text-lg py-6 px-8 shadow-2xl hover:shadow-3xl hover-lift" 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               >
                 Explorar Biblioteca Jurídica

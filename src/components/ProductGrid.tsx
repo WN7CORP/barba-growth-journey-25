@@ -1,6 +1,7 @@
 
 import React, { memo } from 'react';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductSkeleton } from '@/components/ProductSkeleton';
 
 interface Product {
   id: number;
@@ -20,6 +21,7 @@ interface ProductGridProps {
   products: Product[];
   loading?: boolean;
   compact?: boolean;
+  featured?: boolean;
   selectable?: boolean;
   selectedProducts?: Product[];
   onProductToggle?: (product: Product) => void;
@@ -29,15 +31,18 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   products, 
   loading = false, 
   compact = true,
+  featured = false,
   selectable = false,
   selectedProducts = [],
   onProductToggle
 }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3">
-        {Array.from({ length: 12 }).map((_, index) => (
-          <div key={index} className="h-64 bg-white/20 rounded-2xl animate-pulse"></div>
+      <div className={compact ? 'grid-books' : 'grid-books-large'}>
+        {Array.from({ length: compact ? 12 : 8 }).map((_, index) => (
+          <div key={index} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+            <ProductSkeleton compact={compact} />
+          </div>
         ))}
       </div>
     );
@@ -45,36 +50,37 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 animate-fade-in">
-        <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-          <div className="w-16 h-16 text-white/50">📦</div>
+      <div className="text-center py-20 animate-fade-in-up">
+        <div className="w-24 h-24 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-card">
+          <BookOpen className="w-12 h-12 text-muted-foreground" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-4">
-          Nenhum produto encontrado
+        <h2 className="text-display-sm text-foreground mb-4 font-display">
+          Nenhum livro encontrado
         </h2>
-        <p className="text-white/80">
-          Não há produtos disponíveis no momento
+        <p className="text-muted-foreground max-w-md mx-auto">
+          Não há produtos disponíveis no momento. Tente ajustar seus filtros ou volte mais tarde.
         </p>
       </div>
     );
   }
 
   return (
-    <div className={`grid gap-3 md:gap-4 ${
-      compact 
-        ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
-        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-    }`}>
+    <div className={compact ? 'grid-books' : 'grid-books-large'}>
       {products.map((product, index) => (
-        <ProductCard
-          key={product.id}
-          product={product}
-          compact={compact}
-          selectable={selectable}
-          selected={selectedProducts.some(p => p.id === product.id)}
-          onToggle={onProductToggle}
+        <div 
+          key={product.id} 
+          className="animate-fade-in-up"
           style={{ animationDelay: `${index * 0.05}s` }}
-        />
+        >
+          <ProductCard
+            product={product}
+            compact={compact}
+            featured={featured}
+            selectable={selectable}
+            selected={selectedProducts?.some(p => p.id === product.id)}
+            onToggle={onProductToggle}
+          />
+        </div>
       ))}
     </div>
   );
