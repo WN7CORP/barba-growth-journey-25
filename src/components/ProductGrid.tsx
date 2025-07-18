@@ -1,5 +1,6 @@
 
 import React, { memo } from 'react';
+import { BookOpen } from 'lucide-react';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductSkeleton } from '@/components/ProductSkeleton';
 
