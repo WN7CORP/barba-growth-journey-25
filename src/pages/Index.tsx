@@ -58,8 +58,8 @@ const Index = () => {
     }
   };
 
-  const handleProductClick = (product: Product) => {
-    console.log('Product clicked:', product);
+  const handleProductClick = (productId: number) => {
+    console.log('Product clicked:', productId);
   };
 
   const handleTabChange = (tab: string) => {

@@ -1,3 +1,4 @@
+
 import React, { useState, memo, useCallback } from 'react';
 import { Star, Play, Scale, BookOpen, GraduationCap, ShoppingBag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -53,24 +54,35 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
   }, []);
 
-  const formatPrice = useCallback((price: string) => {
-    // Handle null or undefined price
-    if (!price) {
+  const formatPrice = useCallback((price: string | null | undefined) => {
+    // Handle null, undefined, or empty price
+    if (!price || price === null || price === undefined) {
       return 'Preço não disponível';
     }
     
+    // Convert to string if not already
+    const priceStr = String(price);
+    
     // Handle string price - check if already contains R$
-    if (price.includes('R$')) {
-      return price;
+    if (priceStr.includes('R$')) {
+      return priceStr;
     }
-    return `R$ ${price}`;
+    return `R$ ${priceStr}`;
   }, []);
 
-  const getCategoryIcon = useCallback((category: string) => {
-    if (category.includes('Livros') || category.includes('Códigos')) {
+  const getCategoryIcon = useCallback((category: string | null | undefined) => {
+    // Handle null or undefined category
+    if (!category || category === null || category === undefined) {
+      return Scale;
+    }
+    
+    // Convert to string if not already
+    const categoryStr = String(category);
+    
+    if (categoryStr.includes('Livros') || categoryStr.includes('Códigos')) {
       return BookOpen;
     }
-    if (category.includes('Estudo') || category.includes('Preparatórios')) {
+    if (categoryStr.includes('Estudo') || categoryStr.includes('Preparatórios')) {
       return GraduationCap;
     }
     return Scale;
@@ -148,7 +160,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <div className="absolute bottom-1 left-1">
               <Badge variant="secondary" className={`bg-white/95 flex items-center gap-1 shadow-md ${ultraCompact ? 'text-[10px] px-1 py-0' : 'text-xs px-1.5 py-0.5'}`}>
                 <CategoryIcon className={`${ultraCompact ? 'w-2 h-2' : 'w-3 h-3'}`} />
-                <span className={`truncate ${ultraCompact ? 'max-w-10' : 'max-w-16'}`}>{product.categoria.split(' ')[0]}</span>
+                <span className={`truncate ${ultraCompact ? 'max-w-10' : 'max-w-16'}`}>{product.categoria?.split(' ')[0] || ''}</span>
               </Badge>
             </div>
           )}
