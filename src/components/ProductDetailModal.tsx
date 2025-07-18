@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -45,6 +44,9 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   };
 
   const formatPrice = (price: string) => {
+    if (!price) {
+      return 'Preço não disponível';
+    }
     if (price.includes('R$')) {
       return price;
     }
@@ -151,7 +153,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100">
                 <div className="text-sm text-gray-600 mb-1">💰 Oferta especial</div>
                 <div className="text-2xl font-bold text-red-600 mb-3">
-                  Por menos de {formatPrice(product.valor)}
+                  {formatPrice(product.valor)}
                 </div>
                 
                 <div className="flex gap-3">

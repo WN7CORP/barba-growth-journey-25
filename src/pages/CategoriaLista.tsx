@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from '@/components/Header';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
+import { ProductCard } from '@/components/ProductCard';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { SubcategoryCard } from '@/components/SubcategoryCard';
