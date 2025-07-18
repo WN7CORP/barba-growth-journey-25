@@ -7,6 +7,11 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instanciate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "12.2.3 (519615d)"
+  }
   public: {
     Tables: {
       annotations: {
@@ -2533,6 +2538,63 @@ export type Database = {
           },
         ]
       }
+      "HARRY POTTER": {
+        Row: {
+          categoria: string | null
+          descricao: string | null
+          id: number
+          imagem1: string | null
+          imagem2: string | null
+          imagem3: string | null
+          imagem4: string | null
+          imagem5: string | null
+          imagem6: string | null
+          imagem7: string | null
+          link: string | null
+          produto: string | null
+          subcategoria: string | null
+          uso: string | null
+          valor: string | null
+          video: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          descricao?: string | null
+          id?: number
+          imagem1?: string | null
+          imagem2?: string | null
+          imagem3?: string | null
+          imagem4?: string | null
+          imagem5?: string | null
+          imagem6?: string | null
+          imagem7?: string | null
+          link?: string | null
+          produto?: string | null
+          subcategoria?: string | null
+          uso?: string | null
+          valor?: string | null
+          video?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          descricao?: string | null
+          id?: number
+          imagem1?: string | null
+          imagem2?: string | null
+          imagem3?: string | null
+          imagem4?: string | null
+          imagem5?: string | null
+          imagem6?: string | null
+          imagem7?: string | null
+          link?: string | null
+          produto?: string | null
+          subcategoria?: string | null
+          uso?: string | null
+          valor?: string | null
+          video?: string | null
+        }
+        Relationships: []
+      }
       jogos_alfabeto: {
         Row: {
           area_direito: string
@@ -4105,6 +4167,57 @@ export type Database = {
         }
         Relationships: []
       }
+      MUNDODODIREITO: {
+        Row: {
+          categoria: string | null
+          descricao: string | null
+          id: number
+          imagem1: string | null
+          link: string | null
+          produto: string | null
+          valor: string | null
+          video: string | null
+        }
+        Insert: {
+          categoria?: string | null
+          descricao?: string | null
+          id?: number
+          imagem1?: string | null
+          link?: string | null
+          produto?: string | null
+          valor?: string | null
+          video?: string | null
+        }
+        Update: {
+          categoria?: string | null
+          descricao?: string | null
+          id?: number
+          imagem1?: string | null
+          link?: string | null
+          produto?: string | null
+          valor?: string | null
+          video?: string | null
+        }
+        Relationships: []
+      }
+      musicasharrypotter: {
+        Row: {
+          "explorar-categoria": string | null
+          id: number
+          intro: string | null
+        }
+        Insert: {
+          "explorar-categoria"?: string | null
+          id?: number
+          intro?: string | null
+        }
+        Update: {
+          "explorar-categoria"?: string | null
+          id?: number
+          intro?: string | null
+        }
+        Relationships: []
+      }
       noticias: {
         Row: {
           area_direito: string | null
@@ -4514,6 +4627,44 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      product_clicks: {
+        Row: {
+          click_type: string
+          clicked_at: string | null
+          created_at: string | null
+          device_id: string
+          id: string
+          product_id: number
+          user_id: string | null
+        }
+        Insert: {
+          click_type?: string
+          clicked_at?: string | null
+          created_at?: string | null
+          device_id: string
+          id?: string
+          product_id: number
+          user_id?: string | null
+        }
+        Update: {
+          click_type?: string
+          clicked_at?: string | null
+          created_at?: string | null
+          device_id?: string
+          id?: string
+          product_id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_clicks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       product_views: {
         Row: {
@@ -7389,6 +7540,23 @@ export type Database = {
         Args: { p_content_type: string; p_content_ids: string[] }
         Returns: Json
       }
+      get_most_clicked_products_with_videos: {
+        Args: { limit_count?: number }
+        Returns: {
+          id: number
+          produto: string
+          valor: string
+          video: string
+          imagem1: string
+          imagem2: string
+          imagem3: string
+          imagem4: string
+          imagem5: string
+          link: string
+          categoria: string
+          click_count: number
+        }[]
+      }
       get_simulado_leaderboard: {
         Args: { _categoria: string; _limit?: number }
         Returns: {
@@ -7469,21 +7637,25 @@ export type Database = {
   }
 }
 
-type DefaultSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      Database[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
     ? R
@@ -7501,14 +7673,16 @@ export type Tables<
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
@@ -7524,14 +7698,16 @@ export type TablesInsert<
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
     : never = never,
-> = DefaultSchemaTableNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
@@ -7547,14 +7723,16 @@ export type TablesUpdate<
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
     : never = never,
-> = DefaultSchemaEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
@@ -7562,14 +7740,16 @@ export type Enums<
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof Database },
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof Database
+    schema: keyof DatabaseWithoutInternals
   }
-    ? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
     : never = never,
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
     ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
