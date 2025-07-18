@@ -54,6 +54,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const formatPrice = useCallback((price: string) => {
+    // Handle null or undefined price
+    if (!price) {
+      return 'Preço não disponível';
+    }
+    
+    // Handle string price - check if already contains R$
     if (price.includes('R$')) {
       return price;
     }

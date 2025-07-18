@@ -58,18 +58,26 @@ const Index = () => {
     }
   };
 
+  const handleProductClick = (product: Product) => {
+    console.log('Product clicked:', product);
+  };
+
+  const handleTabChange = (tab: string) => {
+    console.log('Tab changed:', tab);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
       {/* Hero Section */}
-      <HeroSection />
+      <HeroSection productsCount={featuredProducts.length} />
       
       {/* Stats Bar */}
       <StatsBar />
       
       {/* Categories */}
-      <CategoryCarousel />
+      <CategoryCarousel products={featuredProducts} onProductClick={handleProductClick} />
       
       {/* Featured Products - Mais Procurados pelos Juristas */}
       <section className="px-4 md:px-6 py-8 bg-white/5">
@@ -117,10 +125,17 @@ const Index = () => {
       </section>
 
       {/* Video Feed */}
-      <VideoFeed />
+      <VideoFeed 
+        product={featuredProducts[0]} 
+        isActive={true} 
+        onBuy={() => console.log('Buy clicked')} 
+      />
       
       {/* Tab Navigation */}
-      <TabNavigation />
+      <TabNavigation 
+        showingAI={false} 
+        onTabChange={handleTabChange} 
+      />
     </div>
   );
 };
