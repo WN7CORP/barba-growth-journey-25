@@ -28,69 +28,53 @@ interface ProductGridProps {
 const ProductGridComponent: React.FC<ProductGridProps> = ({ 
   products, 
   loading = false, 
-  compact = false,
+  compact = true,
   selectable = false,
   selectedProducts = [],
   onProductToggle
 }) => {
-  // Estados de loading
   if (loading) {
     return (
-      <div className={`product-grid ${compact ? 'gap-3' : 'gap-4'}`}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3">
         {Array.from({ length: 12 }).map((_, index) => (
-          <div key={index} className="space-y-3 fade-in" style={{ animationDelay: `${index * 50}ms` }}>
-            <div className="skeleton aspect-[3/4] rounded-lg"></div>
-            <div className="space-y-2">
-              <div className="skeleton-title"></div>
-              <div className="skeleton-text w-1/2"></div>
-              <div className="skeleton h-10 w-full rounded-lg"></div>
-            </div>
-          </div>
+          <div key={index} className="h-64 bg-white/20 rounded-2xl animate-pulse"></div>
         ))}
       </div>
     );
   }
 
-  // Estado vazio
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 fade-in">
-        <div className="space-y-4 max-w-md mx-auto">
-          <div className="w-24 h-24 bg-muted rounded-full flex items-center justify-center mx-auto">
-            <div className="text-4xl">📚</div>
-          </div>
-          <h3 className="text-xl font-semibold text-foreground">
-            Nenhum produto encontrado
-          </h3>
-          <p className="text-muted-foreground">
-            Não há produtos disponíveis no momento ou que correspondam aos filtros aplicados.
-          </p>
+      <div className="text-center py-16 animate-fade-in">
+        <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
+          <div className="w-16 h-16 text-white/50">📦</div>
         </div>
+        <h2 className="text-2xl font-bold text-white mb-4">
+          Nenhum produto encontrado
+        </h2>
+        <p className="text-white/80">
+          Não há produtos disponíveis no momento
+        </p>
       </div>
     );
   }
 
   return (
-    <div className={`
-      ${compact 
-        ? 'grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-        : 'product-grid'
-      }
-    `}>
+    <div className={`grid gap-3 md:gap-4 ${
+      compact 
+        ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
+        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+    }`}>
       {products.map((product, index) => (
-        <div
+        <ProductCard
           key={product.id}
-          className="fade-in"
-          style={{ animationDelay: `${index * 50}ms` }}
-        >
-          <ProductCard
-            product={product}
-            compact={compact}
-            selectable={selectable}
-            selected={selectedProducts.some(p => p.id === product.id)}
-            onToggle={onProductToggle}
-          />
-        </div>
+          product={product}
+          compact={compact}
+          selectable={selectable}
+          selected={selectedProducts.some(p => p.id === product.id)}
+          onToggle={onProductToggle}
+          style={{ animationDelay: `${index * 0.05}s` }}
+        />
       ))}
     </div>
   );
