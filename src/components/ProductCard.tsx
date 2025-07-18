@@ -30,7 +30,6 @@ interface ProductCardProps {
   showBadge?: boolean;
   badgeText?: string;
   compact?: boolean;
-  ultraCompact?: boolean;
   selectable?: boolean;
   selected?: boolean;
   onToggle?: (product: Product) => void;
@@ -42,7 +41,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   showBadge = false,
   badgeText = "MAIS PROCURADO",
   compact = false,
-  ultraCompact = false,
   selectable = false,
   selected = false,
   onToggle,
@@ -54,35 +52,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
   }, []);
 
-  const formatPrice = useCallback((price: string | null | undefined) => {
-    // Handle null, undefined, or empty price
-    if (!price || price === null || price === undefined) {
-      return 'Preço não disponível';
+  const formatPrice = useCallback((price: string) => {
+    if (price.includes('R$')) {
+      return price;
     }
-    
-    // Convert to string if not already
-    const priceStr = String(price);
-    
-    // Handle string price - check if already contains R$
-    if (priceStr.includes('R$')) {
-      return priceStr;
-    }
-    return `R$ ${priceStr}`;
+    return `R$ ${price}`;
   }, []);
 
-  const getCategoryIcon = useCallback((category: string | null | undefined) => {
-    // Handle null or undefined category
-    if (!category || category === null || category === undefined) {
-      return Scale;
-    }
-    
-    // Convert to string if not already
-    const categoryStr = String(category);
-    
-    if (categoryStr.includes('Livros') || categoryStr.includes('Códigos')) {
+  const getCategoryIcon = useCallback((category: string) => {
+    if (category.includes('Livros') || category.includes('Códigos')) {
       return BookOpen;
     }
-    if (categoryStr.includes('Estudo') || categoryStr.includes('Preparatórios')) {
+    if (category.includes('Estudo') || category.includes('Preparatórios')) {
       return GraduationCap;
     }
     return Scale;
@@ -117,7 +98,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
           bg-white border-0 shadow-xl group animate-fade-in cursor-pointer
           ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
-          ${ultraCompact ? 'h-48' : compact ? 'h-64' : ''}
         `}
         onClick={handleCardClick}
       >
@@ -126,7 +106,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className={`overflow-hidden ${ultraCompact ? 'aspect-[4/3] h-24' : compact ? 'aspect-[3/4] h-32' : 'aspect-[3/4]'}`}>
+          <div className="aspect-[3/4] overflow-hidden">
                      <LazyImage 
                        src={image} 
                        alt={`${product.produto} - ${index + 1}`}
@@ -136,31 +116,31 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className={`carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg ${ultraCompact || compact ? 'w-4 h-4' : 'w-6 h-6'}`} />
-            <CarouselNext className={`carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg ${ultraCompact || compact ? 'w-4 h-4' : 'w-6 h-6'}`} />
+            <CarouselPrevious className={`carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
+            <CarouselNext className={`carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
           </Carousel>
           
           {product.video && (
-            <div className={`absolute ${ultraCompact || compact ? 'top-1 right-1' : 'top-2 right-2'}`}>
+            <div className={`absolute ${compact ? 'top-1 right-1' : 'top-2 right-2'}`}>
               <div className="bg-red-600/90 rounded-full p-1.5 shadow-lg animate-pulse">
-                <Play className={`text-white ${ultraCompact ? 'w-2 h-2' : 'w-3 h-3'}`} />
+                <Play className="w-3 h-3 text-white" />
               </div>
             </div>
           )}
           
           {showBadge && (
-            <div className={`absolute ${ultraCompact || compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
-              <Badge className={`bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold animate-bounce shadow-lg ${ultraCompact ? 'text-[10px] px-1 py-0' : 'text-xs'}`}>
+            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+              <Badge className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-xs animate-bounce shadow-lg">
                 {badgeText}
               </Badge>
             </div>
           )}
 
-          {product.categoria && !showBadge && (compact || ultraCompact) && (
+          {product.categoria && !showBadge && compact && (
             <div className="absolute bottom-1 left-1">
-              <Badge variant="secondary" className={`bg-white/95 flex items-center gap-1 shadow-md ${ultraCompact ? 'text-[10px] px-1 py-0' : 'text-xs px-1.5 py-0.5'}`}>
-                <CategoryIcon className={`${ultraCompact ? 'w-2 h-2' : 'w-3 h-3'}`} />
-                <span className={`truncate ${ultraCompact ? 'max-w-10' : 'max-w-16'}`}>{product.categoria?.split(' ')[0] || ''}</span>
+              <Badge variant="secondary" className="text-xs bg-white/95 px-1.5 py-0.5 flex items-center gap-1 shadow-md">
+                <CategoryIcon className="w-3 h-3" />
+                <span className="truncate max-w-16">{product.categoria.split(' ')[0]}</span>
               </Badge>
             </div>
           )}
@@ -177,26 +157,26 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 
           {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
           {!showBadge && !selectable && (
-            <div className={`absolute ${ultraCompact || compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
               <FavoriteButton productId={product.id} showText={false} />
             </div>
           )}
         </div>
 
-        <CardContent className={ultraCompact ? "p-2" : compact ? "p-3" : "p-4"}>
+        <CardContent className={compact ? "p-3" : "p-4"}>
           <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
-            ultraCompact ? 'text-xs mb-1' : compact ? 'text-sm' : 'text-base'
+            compact ? 'text-sm' : 'text-base'
           }`}>
             {product.produto}
           </h3>
           
           <div className="flex items-center justify-between mb-3">
-            <div className={`font-bold text-red-600 ${ultraCompact ? 'text-xs' : compact ? 'text-sm' : 'text-lg'}`}>
-              {formatPrice(product.valor)}
+            <div className={`font-bold text-red-600 ${compact ? 'text-sm' : 'text-lg'}`}>
+              Por menos de {formatPrice(product.valor)}
             </div>
             <div className="flex items-center gap-1">
-              <Star className={`text-amber-500 fill-current ${ultraCompact ? 'w-3 h-3' : 'w-4 h-4'}`} />
-              <span className={`text-gray-600 font-medium ${ultraCompact ? 'text-xs' : 'text-sm'}`}>4.9</span>
+              <Star className="w-4 h-4 text-amber-500 fill-current" />
+              <span className="text-sm text-gray-600 font-medium">4.9</span>
             </div>
           </div>
           
@@ -212,11 +192,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               size="sm" 
               variant="outline"
               className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 ${
-                ultraCompact ? 'py-1 text-xs' : compact ? 'py-2 text-sm' : 'py-3 text-base'
+                compact ? 'py-2 text-sm' : 'py-3 text-base'
               }`}
               onClick={handleCardClick}
             >
-              <BookOpen className={`mr-2 ${ultraCompact ? 'w-3 h-3' : 'w-4 h-4'}`} />
+              <BookOpen className="w-4 h-4 mr-2" />
               Ver mais
             </Button>
           </div>

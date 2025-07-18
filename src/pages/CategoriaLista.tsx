@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Star, ShoppingCart, Filter } from 'lucide-react';
+import { ArrowLeft, Star, ShoppingCart, Filter, Grid } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -282,13 +283,13 @@ const CategoriaLista = () => {
         <div className="flex">
           <div className="flex-1 container mx-auto px-4 py-8">
             <div className="animate-pulse space-y-4">
-              <div className="h-32 bg-gray-200 rounded-lg mb-6"></div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-                {Array.from({ length: 15 }).map((_, index) => (
-                  <div key={index} className="h-64 bg-gray-200 rounded-lg"></div>
-                ))}
-              </div>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="h-24 bg-gray-200 rounded-lg"></div>
+              ))}
             </div>
+          </div>
+          <div className="hidden lg:block">
+            <DesktopSidebar />
           </div>
         </div>
       </div>
@@ -321,26 +322,38 @@ const CategoriaLista = () => {
                 </div>
               </div>
 
-              {/* Controles de filtros - apenas para lista de subcategoria */}
+              {/* Controles de visualização e filtros - apenas para lista de subcategoria */}
               {(tipo === 'subcategoria' || tipo === 'mais-vendidos') && (
-                <div className="flex items-center justify-end gap-2">
-                  <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-                    <SelectTrigger className="w-24 sm:w-32 text-xs sm:text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nome">Nome</SelectItem>
-                      <SelectItem value="preco">Preço</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                    className="px-2 sm:px-3"
-                  >
-                    {sortOrder === 'asc' ? '↑' : '↓'}
-                  </Button>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="p-2"
+                    >
+                      <Grid className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
+                      <SelectTrigger className="w-24 sm:w-32 text-xs sm:text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="nome">Nome</SelectItem>
+                        <SelectItem value="preco">Preço</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-2 sm:px-3"
+                    >
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </Button>
+                  </div>
                 </div>
               )}
             </div>
@@ -388,7 +401,7 @@ const CategoriaLista = () => {
                 )}
               </div>
             ) : (
-              // Show filtered products grid only - SEMPRE EM COLUNA
+              // Show filtered products grid only
               <>
                 {filteredProducts.length === 0 ? (
                   <div className="text-center py-16">
@@ -403,7 +416,7 @@ const CategoriaLista = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
                     {filteredProducts.map((product, index) => renderProductCard(product, index))}
                   </div>
                 )}

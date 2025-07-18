@@ -20,7 +20,7 @@ interface Product {
 }
 
 interface VideoFeedProps {
-  product?: Product;
+  product: Product;
   isActive: boolean;
   onBuy: (product: Product) => void;
 }
@@ -29,11 +29,6 @@ const VideoFeedComponent: React.FC<VideoFeedProps> = ({ product, isActive, onBuy
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  // Early return if no product is provided
-  if (!product) {
-    return null;
-  }
 
   useEffect(() => {
     if (videoRef.current) {
@@ -70,7 +65,6 @@ const VideoFeedComponent: React.FC<VideoFeedProps> = ({ product, isActive, onBuy
   }, [product, onBuy]);
 
   const formatPrice = useCallback((price: string) => {
-    if (!price) return 'Preço não disponível';
     if (price.includes('R$')) {
       return price;
     }
@@ -78,7 +72,6 @@ const VideoFeedComponent: React.FC<VideoFeedProps> = ({ product, isActive, onBuy
   }, []);
 
   const getYouTubeVideoId = (url: string) => {
-    if (!url) return null;
     const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
     const match = url.match(regExp);
     return (match && match[7].length === 11) ? match[7] : null;
@@ -132,13 +125,13 @@ const VideoFeedComponent: React.FC<VideoFeedProps> = ({ product, isActive, onBuy
         <div className="flex justify-between items-end">
           <div className="flex-1 pr-4">
             <Badge className="bg-orange-500 text-white mb-2">
-              {product.categoria || 'Categoria'}
+              {product.categoria}
             </Badge>
             <h3 className="text-white font-bold text-lg mb-2 line-clamp-2">
               {product.produto}
             </h3>
             <p className="text-orange-300 font-bold text-xl mb-4">
-              {formatPrice(product.valor)}
+              Menos de {formatPrice(product.valor)}
             </p>
             <Button 
               onClick={handleBuyClick}
