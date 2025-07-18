@@ -65,7 +65,13 @@ const Novos = () => {
     return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
   };
 
-  const formatPrice = (price: string) => {
+  const formatPrice = (price: string | null) => {
+    // Handle null or undefined price
+    if (!price) {
+      return 'Preço não disponível';
+    }
+    
+    // Handle string price
     if (price.includes('R$')) {
       return price;
     }
