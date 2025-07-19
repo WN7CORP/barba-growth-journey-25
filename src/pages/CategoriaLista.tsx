@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Grid, List, SortAsc, DollarSign } from 'lucide-react';
@@ -14,6 +13,10 @@ interface Product {
   produto: string;
   valor: string;
   imagem1: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem4?: string;
+  imagem5?: string;
   categoria: string;
   descricao?: string;
   link: string;
