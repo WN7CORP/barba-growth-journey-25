@@ -15,7 +15,6 @@ interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -54,7 +53,6 @@ const CategoriaLista = () => {
     try {
       setLoading(true);
       
-      // @ts-ignore - Bypass TypeScript for table name
       const { data, error } = await (supabase as any)
         .from('MUNDODODIREITO')
         .select('*')
@@ -63,7 +61,6 @@ const CategoriaLista = () => {
 
       if (error) throw error;
       
-      // @ts-ignore - Bypass TypeScript for data casting
       setProducts(data || []);
       
     } catch (error) {
@@ -95,14 +92,8 @@ const CategoriaLista = () => {
     setSearchTerm(term);
   };
 
-  // Fix the price filter function to match PriceFilter component signature
   const handlePriceFilter = (minPrice: number, maxPrice: number) => {
     setPriceRange([minPrice, maxPrice]);
-  };
-
-  // Fix the price range handler for local state
-  const handlePriceRangeChange = (range: [number, number]) => {
-    setPriceRange(range);
   };
 
   const handlePriceFilterClear = () => {
@@ -208,10 +199,11 @@ const CategoriaLista = () => {
           )}
         </div>
 
-        {/* Products Grid - using only existing props */}
+        {/* Products Grid - forced to list view */}
         <ProductGrid 
           products={filteredProducts} 
           loading={loading}
+          compact={false}
         />
         
         {/* Custom empty state when no products found */}

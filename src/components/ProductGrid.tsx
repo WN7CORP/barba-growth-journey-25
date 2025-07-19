@@ -6,7 +6,6 @@ interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -28,14 +27,18 @@ interface ProductGridProps {
 const ProductGridComponent: React.FC<ProductGridProps> = ({ 
   products, 
   loading = false, 
-  compact = true,
+  compact = false,
   selectable = false,
   selectedProducts = [],
   onProductToggle
 }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3">
+      <div className={`grid gap-2 md:gap-3 ${
+        compact 
+          ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6' 
+          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+      }`}>
         {Array.from({ length: 12 }).map((_, index) => (
           <div key={index} className="h-64 bg-white/20 rounded-2xl animate-pulse"></div>
         ))}

@@ -4666,6 +4666,39 @@ export type Database = {
           },
         ]
       }
+      product_purchases: {
+        Row: {
+          created_at: string | null
+          id: string
+          product_category: string | null
+          product_id: number
+          product_name: string | null
+          product_value: string | null
+          purchased_at: string | null
+          user_device_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          product_category?: string | null
+          product_id: number
+          product_name?: string | null
+          product_value?: string | null
+          purchased_at?: string | null
+          user_device_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          product_category?: string | null
+          product_id?: number
+          product_name?: string | null
+          product_value?: string | null
+          purchased_at?: string | null
+          user_device_id?: string | null
+        }
+        Relationships: []
+      }
       product_views: {
         Row: {
           id: string
@@ -7555,6 +7588,17 @@ export type Database = {
           link: string
           categoria: string
           click_count: number
+        }[]
+      }
+      get_most_purchased_products: {
+        Args: { limit_count?: number }
+        Returns: {
+          product_id: number
+          product_name: string
+          product_category: string
+          product_value: string
+          purchase_count: number
+          last_purchase: string
         }[]
       }
       get_simulado_leaderboard: {
