@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase } from 'lucide-react';
+import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -297,6 +296,33 @@ const Index = () => {
     );
   }
 
+  const renderMaisCompradosSection = () => (
+    <section className="px-4 md:px-6 py-8 md:py-12 bg-gradient-to-r from-amber-600/20 via-orange-600/20 to-red-600/20 backdrop-blur-sm animate-fade-in">
+      <div className="max-w-7xl mx-auto">
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-amber-500/20 rounded-2xl flex items-center justify-center backdrop-blur-sm animate-bounce">
+              <TrendingUp className="w-6 h-6 text-amber-300" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold text-white animate-slide-in-left">
+              📈 Mais Comprados
+            </h2>
+          </div>
+          <p className="text-base text-white/90 animate-slide-in-right mb-4">
+            Os materiais jurídicos preferidos da nossa comunidade
+          </p>
+          <Button 
+            onClick={() => navigate('/mais-comprados')}
+            className="bg-amber-500 text-blue-900 hover:bg-amber-400 font-semibold transition-all duration-300 hover:scale-105"
+          >
+            Ver Estatísticas Completas
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+      </div>
+    </section>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
       <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
@@ -352,6 +378,9 @@ const Index = () => {
 
       {/* Hero Section */}
       <HeroSection productsCount={filteredProducts.length} />
+
+      {/* Seção Mais Comprados */}
+      {renderMaisCompradosSection()}
 
       {/* Category Product Carousels - show all categories when not in AI mode */}
       {!showingAI && legalCategories.map((category, index) => {

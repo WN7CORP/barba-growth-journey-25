@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Brain } from 'lucide-react';
+import { Brain, TrendingUp } from 'lucide-react';
 
 interface TabNavigationProps {
   showingAI: boolean;
@@ -17,8 +17,9 @@ export const TabNavigation: React.FC<TabNavigationProps> = ({
       <Button
         variant={!showingAI ? 'default' : 'outline'}
         onClick={() => onTabChange('featured')}
-        className={`${!showingAI ? 'bg-white text-red-600' : 'bg-white/20 text-white border-white/30'}`}
+        className={`${!showingAI ? 'bg-white text-red-600' : 'bg-white/20 text-white border-white/30'} flex items-center gap-2`}
       >
+        <TrendingUp className="w-4 h-4" />
         🔥 Mais Vendidos
       </Button>
       <Button

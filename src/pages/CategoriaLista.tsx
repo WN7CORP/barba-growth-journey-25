@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Search, Filter } from 'lucide-react';
@@ -208,10 +207,11 @@ const CategoriaLista = () => {
           )}
         </div>
 
-        {/* Products Grid - using only existing props */}
+        {/* Products Grid - FORMATO LISTA */}
         <ProductGrid 
           products={filteredProducts} 
           loading={loading}
+          compact={false}
         />
         
         {/* Custom empty state when no products found */}
