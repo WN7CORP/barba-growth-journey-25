@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { X, ShoppingCart, Star, Info, Sparkles } from 'lucide-react';
+import { X, ShoppingCart, Star, Info, Sparkles, Zap } from 'lucide-react';
 import { ProductBreadcrumb } from '@/components/ProductBreadcrumb';
 import { ShareButton } from '@/components/ShareButton';
 import { FavoriteButton } from '@/components/FavoriteButton';
@@ -97,15 +97,17 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl h-full max-h-[100vh] sm:max-h-[95vh] overflow-hidden p-0 bg-white m-0 sm:m-2">
-        {/* Header with breadcrumb - Mobile Optimized */}
+      <DialogContent className="w-full max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-5xl h-full max-h-[90vh] sm:max-h-[85vh] overflow-hidden p-0 bg-white m-0 sm:m-2">
+        <DialogTitle className="sr-only">{product.produto}</DialogTitle>
+        
+        {/* Compact Header */}
         <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white">
-          <div className="flex items-center justify-between p-3 md:p-4">
-            <div className="flex-1 pr-3 md:pr-4 min-w-0">
-              <h2 className="text-sm md:text-lg font-bold line-clamp-2 mb-1">
+          <div className="flex items-center justify-between p-3">
+            <div className="flex-1 pr-3 min-w-0">
+              <h2 className="text-sm md:text-base font-bold line-clamp-1 mb-1">
                 {product.produto}
               </h2>
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-2">
                 <Badge className="bg-white/20 text-white border-white/30 text-xs">
                   {product.categoria}
                 </Badge>
@@ -119,23 +121,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               onClick={onClose}
               variant="ghost" 
               size="sm"
-              className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-8 h-8 md:w-10 md:h-10 p-0 flex-shrink-0"
+              className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-8 h-8 p-0 flex-shrink-0"
             >
-              <X className="w-4 h-4 md:w-5 md:h-5" />
+              <X className="w-4 h-4" />
             </Button>
-          </div>
-          <div className="px-3 md:px-4 pb-2">
-            <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
           </div>
         </div>
 
-        {/* Main Content - Mobile First Layout */}
+        {/* Compact Main Content */}
         <div className="flex flex-col h-full overflow-y-auto">
-          <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6">
+          <div className="flex flex-col md:flex-row gap-3 p-3">
             
-            {/* Image Gallery - Full width on mobile, 1/3 on desktop */}
+            {/* Compact Image Gallery */}
             <div className="w-full md:w-1/3 flex-shrink-0">
-              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner">
+              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden">
                 <Carousel className="w-full">
                   <CarouselContent>
                     {getProductImages().map((image, index) => (
@@ -150,112 +149,96 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="left-2 bg-white/90 hover:bg-white shadow-lg w-8 h-8" />
-                  <CarouselNext className="right-2 bg-white/90 hover:bg-white shadow-lg w-8 h-8" />
+                  <CarouselPrevious className="left-1 bg-white/90 hover:bg-white w-6 h-6" />
+                  <CarouselNext className="right-1 bg-white/90 hover:bg-white w-6 h-6" />
                 </Carousel>
-              </div>
-
-              {/* Thumbnails */}
-              <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
-                {getProductImages().map((image, index) => (
-                  <div
-                    key={index}
-                    className="flex-shrink-0 w-12 h-16 rounded border-2 border-gray-200 overflow-hidden"
-                  >
-                    <img
-                      src={image}
-                      alt={`Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
               </div>
             </div>
 
-            {/* Product Information - Full width on mobile, 2/3 on desktop */}
-            <div className="w-full md:w-2/3 space-y-4 md:space-y-6">
+            {/* Strategic Purchase Area */}
+            <div className="w-full md:w-2/3 space-y-3">
               
-              {/* Price and Actions */}
-              <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100">
-                <div className="text-sm text-gray-600 mb-1 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-purple-600" />
-                  💰 Oferta especial
+              {/* Strategic Price & Buy Section */}
+              <div className="bg-gradient-to-r from-red-50 to-orange-50 p-4 rounded-xl border-2 border-red-200 shadow-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-orange-500" />
+                  <span className="text-sm font-bold text-orange-700">OFERTA LIMITADA</span>
                 </div>
-                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-red-600 mb-4">
+                
+                <div className="text-2xl md:text-3xl font-bold text-red-600 mb-3">
                   {formatPrice(product.valor)}
                 </div>
                 
-                <div className="flex gap-2 md:gap-3 flex-wrap">
-                  <FavoriteButton 
-                    productId={product.id}
-                    className="border-red-300 text-red-600 hover:bg-red-50 font-medium"
-                  />
-                  <ShareButton 
-                    productName={product.produto}
-                    productLink={product.link}
-                  />
+                {/* Strategic Action Buttons */}
+                <div className="space-y-2">
                   <Button
                     onClick={handleBuyClick}
-                    className="flex-1 min-w-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg text-sm md:text-base px-4 py-2"
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold shadow-lg text-base py-3 animate-pulse"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2 flex-shrink-0" />
-                    <span className="truncate">Comprar Agora</span>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    COMPRAR AGORA
                   </Button>
+                  
+                  <div className="flex gap-2">
+                    <FavoriteButton 
+                      productId={product.id}
+                      size="sm"
+                      className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
+                    />
+                    <ShareButton 
+                      productName={product.produto}
+                      productLink={product.link}
+                    />
+                  </div>
+                </div>
+                
+                <div className="mt-3 p-2 bg-yellow-100 rounded-lg border border-yellow-300">
+                  <p className="text-xs text-yellow-800 font-medium text-center">
+                    ⚡ Apenas hoje! Não perca esta oportunidade
+                  </p>
                 </div>
               </div>
 
-              {/* Content Tabs */}
-              <Tabs defaultValue="description" className="w-full">
-                <TabsList className="grid w-full grid-cols-1 bg-gray-100 p-1 rounded-xl">
-                  <TabsTrigger value="description" className="text-sm font-medium rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                    <Info className="w-4 h-4 mr-2" />
-                    Informações Detalhadas
-                  </TabsTrigger>
-                </TabsList>
+              {/* Compact Content */}
+              <div className="bg-white rounded-lg border p-3">
+                <h4 className="font-bold mb-2 text-sm flex items-center gap-2">
+                  <Info className="w-4 h-4 text-blue-600" />
+                  Sobre o Material
+                </h4>
+                <p className="text-xs text-gray-700 leading-relaxed mb-3 line-clamp-3">
+                  {getProductDescription()}
+                </p>
                 
-                <TabsContent value="description" className="mt-4">
-                  <Card className="border-0 shadow-sm">
-                    <CardContent className="p-4">
-                      <p className="text-sm text-gray-700 leading-relaxed mb-4 text-justify">
-                        {getProductDescription()}
-                      </p>
-                      
-                      <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                        <h4 className="font-bold mb-2 text-sm text-blue-800 flex items-center gap-2">
-                          <Star className="w-4 h-4" />
-                          Características:
-                        </h4>
-                        <ul className="text-sm text-blue-700 space-y-1">
-                          <li className="flex items-center gap-2">✅ Conteúdo atualizado</li>
-                          <li className="flex items-center gap-2">✅ Linguagem técnica</li>
-                          <li className="flex items-center gap-2">✅ Aplicação prática</li>
-                          <li className="flex items-center gap-2">✅ Referência confiável</li>
-                        </ul>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
+                <div className="bg-blue-50 p-2 rounded-lg border border-blue-200">
+                  <h5 className="font-bold mb-1 text-xs text-blue-800">Características:</h5>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-blue-700">
+                    <div className="flex items-center gap-1">✅ Atualizado</div>
+                    <div className="flex items-center gap-1">✅ Técnico</div>
+                    <div className="flex items-center gap-1">✅ Prático</div>
+                    <div className="flex items-center gap-1">✅ Confiável</div>
+                  </div>
+                </div>
+              </div>
 
-              {/* Related Products */}
+              {/* Compact Related Products */}
               {relatedProducts.length > 0 && (
-                <div className="mt-6 md:mt-8">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-600" />
-                    Produtos Relacionados
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    Relacionados
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                     {relatedProducts.map((relatedProduct) => (
-                      <div key={relatedProduct.id} className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-shadow cursor-pointer">
+                      <div key={relatedProduct.id} className="bg-white rounded-lg border p-2 hover:shadow-md transition-shadow cursor-pointer">
                         <img 
                           src={relatedProduct.imagem1} 
                           alt={relatedProduct.produto}
-                          className="w-full h-20 md:h-24 object-cover rounded mb-2"
+                          className="w-full h-16 object-cover rounded mb-1"
                         />
                         <h4 className="text-xs font-medium text-gray-900 line-clamp-2 mb-1">
                           {relatedProduct.produto}
                         </h4>
-                        <p className="text-sm font-bold text-red-600">
+                        <p className="text-xs font-bold text-red-600">
                           {formatPrice(relatedProduct.valor)}
                         </p>
                       </div>

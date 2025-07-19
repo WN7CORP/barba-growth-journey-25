@@ -99,28 +99,41 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-all cursor-pointer" onClick={handleCardClick}>
-          <div className="w-20 h-24 flex-shrink-0">
+        <div className="flex gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all cursor-pointer border border-gray-100" onClick={handleCardClick}>
+          {/* Compact Cover Image */}
+          <div className="w-16 h-20 flex-shrink-0">
             <img 
               src={product.imagem1} 
               alt={product.produto}
-              className="w-full h-full object-cover rounded"
+              className="w-full h-full object-cover rounded border"
             />
           </div>
-          <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
-              {product.produto}
-            </h3>
-            <Badge variant="secondary" className="mb-2">
-              {product.categoria}
-            </Badge>
+          
+          {/* Compact Info */}
+          <div className="flex-1 min-w-0 flex flex-col justify-between">
+            <div>
+              <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm mb-1 leading-tight">
+                {product.produto}
+              </h3>
+              <Badge variant="secondary" className="text-xs mb-2">
+                {product.categoria}
+              </Badge>
+            </div>
+            
             <div className="flex items-center justify-between">
-              <div className="font-bold text-red-600">
+              <div className="font-bold text-red-600 text-sm">
                 {formatPrice(product.valor)}
               </div>
-              <Button size="sm" onClick={handleVerMaisClick}>
-                Ver mais
-              </Button>
+              <div className="flex items-center gap-2">
+                <FavoriteButton 
+                  productId={product.id} 
+                  size="sm" 
+                  showText={false}
+                />
+                <Button size="sm" onClick={handleVerMaisClick} className="bg-blue-600 hover:bg-blue-700">
+                  Ver mais
+                </Button>
+              </div>
             </div>
           </div>
         </div>

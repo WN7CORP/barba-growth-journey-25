@@ -71,7 +71,6 @@ const CategoriaLista = () => {
           
           setProducts(sortedProducts);
         } else {
-          // Fallback to all products
           // @ts-ignore - Bypass TypeScript for table name
           const { data, error } = await (supabase as any)
             .from('MUNDODODIREITO')

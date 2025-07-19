@@ -37,12 +37,12 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   if (loading) {
     return (
       <div className={listView 
-        ? "space-y-4" 
+        ? "space-y-3" 
         : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3"
       }>
         {Array.from({ length: listView ? 8 : 12 }).map((_, index) => (
           <div key={index} className={listView 
-            ? "h-32 bg-white/20 rounded-2xl animate-pulse" 
+            ? "h-24 bg-white/20 rounded-lg animate-pulse" 
             : "h-64 bg-white/20 rounded-2xl animate-pulse"
           }></div>
         ))}
@@ -68,11 +68,11 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (listView) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {products.map((product, index) => (
           <div
             key={product.id}
-            className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 hover:bg-white/15 transition-all duration-300 animate-fade-in"
+            className="bg-white/10 backdrop-blur-sm rounded-lg hover:bg-white/15 transition-all duration-300 animate-fade-in"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             <ProductCard
