@@ -14,13 +14,9 @@ interface Product {
   produto: string;
   valor: string;
   imagem1: string;
-  imagem2: string;
-  imagem3: string;
-  imagem4: string;
-  imagem5: string;
-  link: string;
   categoria: string;
   descricao?: string;
+  link: string;
 }
 
 const CategoriaLista = () => {
@@ -34,17 +30,14 @@ const CategoriaLista = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'nome' | 'preco'>('nome');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>(viewParam === 'list' ? 'list' : 'grid');
+  // Default para lista compacta quando vem de categorias
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(viewParam === 'grid' ? 'grid' : 'list');
   
   const { data: mostPurchased } = useMostPurchased(100);
 
   useEffect(() => {
     fetchProducts();
   }, [categoria, tipo]);
-
-  useEffect(() => {
-    sortProducts();
-  }, [products, sortBy, sortOrder]);
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -54,8 +47,7 @@ const CategoriaLista = () => {
         if (mostPurchased && mostPurchased.length > 0) {
           const productIds = mostPurchased.map(p => p.product_id);
           
-          // @ts-ignore - Bypass TypeScript for table name
-          const { data, error } = await (supabase as any)
+          const { data, error } = await supabase
             .from('MUNDODODIREITO')
             .select('*')
             .in('id', productIds);
@@ -71,8 +63,7 @@ const CategoriaLista = () => {
           
           setProducts(sortedProducts);
         } else {
-          // @ts-ignore - Bypass TypeScript for table name
-          const { data, error } = await (supabase as any)
+          const { data, error } = await supabase
             .from('MUNDODODIREITO')
             .select('*')
             .limit(50);
@@ -81,8 +72,8 @@ const CategoriaLista = () => {
           setProducts(data || []);
         }
       } else {
-        // Regular category filtering
-        let query = (supabase as any).from('MUNDODODIREITO').select('*');
+        // Regular category filtering - sempre usar MUNDODODIREITO
+        let query = supabase.from('MUNDODODIREITO').select('*');
         
         if (categoria && categoria !== 'todas') {
           query = query.eq('categoria', categoria);
@@ -91,6 +82,10 @@ const CategoriaLista = () => {
         const { data, error } = await query.order('id');
         
         if (error) throw error;
+        
+        console.log('Produtos encontrados para categoria', categoria, ':', data?.length);
+        console.log('Primeiros produtos:', data?.slice(0, 3));
+        
         setProducts(data || []);
       }
     } catch (error) {
@@ -101,6 +96,7 @@ const CategoriaLista = () => {
   };
 
   const parsePrice = (priceString: string): number => {
+    if (!priceString) return 0;
     const cleanPrice = priceString.replace(/[^\d,]/g, '').replace(',', '.');
     return parseFloat(cleanPrice) || 0;
   };
@@ -120,9 +116,15 @@ const CategoriaLista = () => {
     setProducts(sorted);
   };
 
+  useEffect(() => {
+    if (products.length > 0) {
+      sortProducts();
+    }
+  }, [sortBy, sortOrder]);
+
   const getPageTitle = () => {
     if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
-      return '📈 Produtos Mais Comprados';
+      return '📈 Materiais Mais Comprados';
     }
     
     if (categoria && categoria !== 'todas') {
@@ -168,7 +170,7 @@ const CategoriaLista = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/categorias')} 
             className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -258,10 +260,10 @@ const CategoriaLista = () => {
               Nenhum produto encontrado
             </h2>
             <p className="text-white/80 mb-6">
-              Não há produtos disponíveis nesta categoria
+              Não há produtos disponíveis nesta categoria no momento
             </p>
-            <Button onClick={() => navigate('/')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
-              Explorar Outros Materiais
+            <Button onClick={() => navigate('/categorias')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
+              Explorar Outras Categorias
             </Button>
           </div>
         )}

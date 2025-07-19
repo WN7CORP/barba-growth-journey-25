@@ -11,6 +11,7 @@ import Novos from "./pages/Novos";
 import CategoriaLista from "./pages/CategoriaLista";
 import SubcategoriaLista from "./pages/SubcategoriaLista";
 import MaisComprados from "./pages/MaisComprados";
+import Explorar from "./pages/Explorar";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/categoria-lista" element={<CategoriaLista />} />
           <Route path="/subcategoria-lista" element={<SubcategoriaLista />} />
           <Route path="/mais-comprados" element={<MaisComprados />} />
+          <Route path="/explorar" element={<Explorar />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

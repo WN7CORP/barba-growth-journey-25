@@ -14,10 +14,10 @@ interface Product {
   produto: string;
   valor: string;
   imagem1: string;
-  imagem2: string;
-  imagem3: string;
-  imagem4: string;
-  imagem5: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem4?: string;
+  imagem5?: string;
   link: string;
   categoria: string;
   descricao?: string;
@@ -53,7 +53,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const formatPrice = useCallback((price: string) => {
-    if (!price) return 'Preço não disponível';
+    if (!price) return 'Consulte o preço';
     if (price.includes('R$')) {
       return price;
     }
@@ -62,10 +62,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 
   const getCategoryIcon = useCallback((category: string) => {
     if (!category) return Scale;
-    if (category.includes('Livros') || category.includes('Códigos')) {
+    if (category.includes('Livros') || category.includes('Códigos') || category.includes('Vade')) {
       return BookOpen;
     }
-    if (category.includes('Estudo') || category.includes('Preparatórios')) {
+    if (category.includes('Estudo') || category.includes('Preparatórios') || category.includes('Iniciante')) {
       return GraduationCap;
     }
     return Scale;
@@ -99,29 +99,37 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-3 p-3 bg-white rounded-lg hover:shadow-md transition-all cursor-pointer border border-gray-100" onClick={handleCardClick}>
-          {/* Compact Cover Image */}
-          <div className="w-16 h-20 flex-shrink-0">
-            <img 
+        <div className="flex gap-4 p-4 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-100 hover:border-purple-200" onClick={handleCardClick}>
+          {/* Capa Compacta */}
+          <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+            <LazyImage 
               src={product.imagem1} 
               alt={product.produto}
-              className="w-full h-full object-cover rounded border"
+              className="w-full h-full object-cover"
             />
           </div>
           
-          {/* Compact Info */}
+          {/* Informações do Produto */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="font-semibold text-gray-900 line-clamp-2 text-sm mb-1 leading-tight">
+              <h3 className="font-bold text-gray-900 line-clamp-2 text-base mb-2 leading-tight">
                 {product.produto}
               </h3>
-              <Badge variant="secondary" className="text-xs mb-2">
-                {product.categoria}
-              </Badge>
+              <div className="flex items-center gap-2 mb-2">
+                <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                  <CategoryIcon className="w-3 h-3" />
+                  {product.categoria}
+                </Badge>
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-amber-500 fill-current" />
+                  <span className="text-xs text-gray-600 font-medium">4.8</span>
+                </div>
+              </div>
             </div>
             
+            {/* Preço e Ações */}
             <div className="flex items-center justify-between">
-              <div className="font-bold text-red-600 text-sm">
+              <div className="font-bold text-green-600 text-lg">
                 {formatPrice(product.valor)}
               </div>
               <div className="flex items-center gap-2">
@@ -130,8 +138,20 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                   size="sm" 
                   showText={false}
                 />
-                <Button size="sm" onClick={handleVerMaisClick} className="bg-blue-600 hover:bg-blue-700">
-                  Ver mais
+                <Button 
+                  size="sm" 
+                  onClick={handleVerMaisClick} 
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
+                >
+                  Ver detalhes
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={handleBuyClick}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-4"
+                >
+                  <ShoppingBag className="w-4 h-4 mr-1" />
+                  Comprar
                 </Button>
               </div>
             </div>
@@ -220,12 +240,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           </h3>
           
           <div className="flex items-center justify-between mb-3">
-            <div className={`font-bold text-red-600 ${compact ? 'text-sm' : 'text-lg'}`}>
+            <div className={`font-bold text-green-600 ${compact ? 'text-sm' : 'text-lg'}`}>
               {formatPrice(product.valor)}
             </div>
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 text-amber-500 fill-current" />
-              <span className="text-sm text-gray-600 font-medium">4.9</span>
+              <span className="text-sm text-gray-600 font-medium">4.8</span>
             </div>
           </div>
           
@@ -246,7 +266,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               onClick={handleVerMaisClick}
             >
               <BookOpen className="w-4 h-4 mr-2" />
-              Ver mais
+              Ver detalhes
             </Button>
           </div>
         </CardContent>
