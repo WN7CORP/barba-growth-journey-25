@@ -1,21 +1,18 @@
 
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Filter } from 'lucide-react';
+import { ArrowLeft, Grid, List, SortAsc, DollarSign } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from '@/components/Header';
 import { ProductGrid } from '@/components/ProductGrid';
-import { PriceFilter } from '@/components/PriceFilter';
 import { supabase } from "@/integrations/supabase/client";
-import { useToastNotifications } from '@/hooks/useToastNotifications';
+import { useMostPurchased } from '@/hooks/useMostPurchased';
 
 interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -29,108 +26,142 @@ interface Product {
 const CategoriaLista = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const categoria = searchParams.get('categoria');
+  const tipo = searchParams.get('tipo');
+  const viewParam = searchParams.get('view');
+  
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [showPriceFilter, setShowPriceFilter] = useState(false);
-  const { showError } = useToastNotifications();
-
-  const categoria = searchParams.get('categoria') || '';
-  const tipo = searchParams.get('tipo') || '';
+  const [sortBy, setSortBy] = useState<'nome' | 'preco'>('nome');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(viewParam === 'list' ? 'list' : 'grid');
+  
+  const { data: mostPurchased } = useMostPurchased(100);
 
   useEffect(() => {
-    if (categoria) {
-      fetchProducts();
-    }
-  }, [categoria]);
+    fetchProducts();
+  }, [categoria, tipo]);
 
   useEffect(() => {
-    filterProducts();
-  }, [products, searchTerm, priceRange]);
+    sortProducts();
+  }, [products, sortBy, sortOrder]);
 
   const fetchProducts = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      
-      // @ts-ignore - Bypass TypeScript for table name
-      const { data, error } = await (supabase as any)
-        .from('MUNDODODIREITO')
-        .select('*')
-        .eq('categoria', categoria)
-        .order('id', { ascending: false });
+      if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
+        // Get most purchased products
+        if (mostPurchased && mostPurchased.length > 0) {
+          const productIds = mostPurchased.map(p => p.product_id);
+          
+          // @ts-ignore - Bypass TypeScript for table name
+          const { data, error } = await (supabase as any)
+            .from('MUNDODODIREITO')
+            .select('*')
+            .in('id', productIds);
 
-      if (error) throw error;
-      
-      // @ts-ignore - Bypass TypeScript for data casting
-      setProducts(data || []);
-      
+          if (error) throw error;
+          
+          // Sort by purchase count
+          const sortedProducts = (data || []).sort((a: Product, b: Product) => {
+            const aPurchases = mostPurchased.find(p => p.product_id === a.id)?.purchase_count || 0;
+            const bPurchases = mostPurchased.find(p => p.product_id === b.id)?.purchase_count || 0;
+            return bPurchases - aPurchases;
+          });
+          
+          setProducts(sortedProducts);
+        } else {
+          // Fallback to all products
+          // @ts-ignore - Bypass TypeScript for table name
+          const { data, error } = await (supabase as any)
+            .from('MUNDODODIREITO')
+            .select('*')
+            .limit(50);
+
+          if (error) throw error;
+          setProducts(data || []);
+        }
+      } else {
+        // Regular category filtering
+        let query = (supabase as any).from('MUNDODODIREITO').select('*');
+        
+        if (categoria && categoria !== 'todas') {
+          query = query.eq('categoria', categoria);
+        }
+        
+        const { data, error } = await query.order('id');
+        
+        if (error) throw error;
+        setProducts(data || []);
+      }
     } catch (error) {
       console.error('Erro ao buscar produtos:', error);
-      showError('Erro ao carregar produtos');
     } finally {
       setLoading(false);
     }
   };
 
-  const filterProducts = () => {
-    let filtered = [...products];
+  const parsePrice = (priceString: string): number => {
+    const cleanPrice = priceString.replace(/[^\d,]/g, '').replace(',', '.');
+    return parseFloat(cleanPrice) || 0;
+  };
 
-    if (searchTerm) {
-      filtered = filtered.filter(product =>
-        product.produto.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    filtered = filtered.filter(product => {
-      const price = parseFloat(product.valor?.replace(/[R$\s]/g, '') || '0');
-      return price >= priceRange[0] && price <= priceRange[1];
+  const sortProducts = () => {
+    const sorted = [...products].sort((a, b) => {
+      if (sortBy === 'nome') {
+        const comparison = a.produto.localeCompare(b.produto);
+        return sortOrder === 'asc' ? comparison : -comparison;
+      } else {
+        const priceA = parsePrice(a.valor);
+        const priceB = parsePrice(b.valor);
+        const comparison = priceA - priceB;
+        return sortOrder === 'asc' ? comparison : -comparison;
+      }
     });
-
-    setFilteredProducts(filtered);
+    setProducts(sorted);
   };
 
-  const handleSearch = (term: string) => {
-    setSearchTerm(term);
-  };
-
-  // Fix the price filter function to match PriceFilter component signature
-  const handlePriceFilter = (minPrice: number, maxPrice: number) => {
-    setPriceRange([minPrice, maxPrice]);
-  };
-
-  // Fix the price range handler for local state
-  const handlePriceRangeChange = (range: [number, number]) => {
-    setPriceRange(range);
-  };
-
-  const handlePriceFilterClear = () => {
-    setPriceRange([0, 1000]);
-  };
-
-  const getCategoryTitle = () => {
-    if (tipo === 'categoria') {
+  const getPageTitle = () => {
+    if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
+      return '📈 Produtos Mais Comprados';
+    }
+    
+    if (categoria && categoria !== 'todas') {
       return `📚 ${categoria}`;
-    } else if (tipo === 'subcategoria') {
-      return `📖 ${categoria}`;
     }
-    return categoria;
+    
+    return '📚 Todos os Materiais Jurídicos';
   };
 
-  const getCategoryDescription = () => {
-    const count = filteredProducts.length;
-    if (tipo === 'categoria') {
-      return `${count} materiais encontrados nesta categoria`;
-    } else if (tipo === 'subcategoria') {
-      return `${count} itens encontrados nesta subcategoria`;
+  const getPageDescription = () => {
+    if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
+      return `Os ${products.length} materiais mais procurados pelos profissionais`;
     }
-    return `${count} produtos encontrados`;
+    
+    if (categoria && categoria !== 'todas') {
+      return `${products.length} materiais disponíveis em ${categoria}`;
+    }
+    
+    return `${products.length} materiais jurídicos disponíveis`;
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+        <Header onSearch={() => {}} onPriceFilter={() => {}} />
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse space-y-6">
+            <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
+            <ProductGrid loading={true} products={[]} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
-      <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
+      <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -138,94 +169,101 @@ const CategoriaLista = () => {
           <Button 
             variant="ghost" 
             size="sm" 
-            onClick={() => navigate(-1)} 
+            onClick={() => navigate('/')} 
             className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
           <div className="flex-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-white animate-slide-in-left">
-              {getCategoryTitle()}
+            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
+              {getPageTitle()}
             </h1>
-            <p className="text-white/80 animate-slide-in-right">
-              {getCategoryDescription()}
+            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
+              {getPageDescription()}
             </p>
           </div>
         </div>
 
-        {/* Search and Filter Bar */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 animate-fade-in">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-5 h-5" />
-              <Input
-                placeholder="Buscar produtos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-white/20 border-white/30 text-white placeholder-white/60 focus:border-purple-400"
-              />
-            </div>
+        {/* Controls */}
+        <div className="flex items-center justify-between mb-6 gap-4 animate-fade-in">
+          <div className="flex items-center gap-2">
             <Button
-              variant="outline"
-              onClick={() => setShowPriceFilter(!showPriceFilter)}
-              className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+              size="sm"
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              onClick={() => setViewMode('grid')}
+              className={viewMode === 'grid' 
+                ? 'bg-white text-blue-900' 
+                : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+              }
             >
-              <Filter className="w-4 h-4 mr-2" />
-              Filtros
+              <Grid className="w-4 h-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              onClick={() => setViewMode('list')}
+              className={viewMode === 'list' 
+                ? 'bg-white text-blue-900' 
+                : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+              }
+            >
+              <List className="w-4 h-4" />
             </Button>
           </div>
-
-          {showPriceFilter && (
-            <div className="mt-4 animate-fade-in">
-              <PriceFilter
-                onFilter={handlePriceFilter}
-                onClear={handlePriceFilterClear}
-              />
-            </div>
-          )}
-
-          {/* Active Filters */}
-          {(searchTerm || priceRange[0] > 0 || priceRange[1] < 1000) && (
-            <div className="flex flex-wrap gap-2 mt-4">
-              {searchTerm && (
-                <Badge 
-                  variant="secondary" 
-                  className="bg-purple-500/20 text-purple-200 border-purple-400/30"
-                >
-                  Busca: {searchTerm}
-                </Badge>
-              )}
-              {(priceRange[0] > 0 || priceRange[1] < 1000) && (
-                <Badge 
-                  variant="secondary" 
-                  className="bg-green-500/20 text-green-200 border-green-400/30"
-                >
-                  Preço: R$ {priceRange[0]} - R$ {priceRange[1]}
-                </Badge>
-              )}
-            </div>
-          )}
+          
+          <div className="flex gap-2">
+            <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
+              <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white border-gray-300 z-50">
+                <SelectItem value="nome">
+                  <div className="flex items-center gap-2">
+                    <SortAsc className="w-4 h-4" />
+                    Nome
+                  </div>
+                </SelectItem>
+                <SelectItem value="preco">
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="w-4 h-4" />
+                    Preço
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+            >
+              {sortOrder === 'asc' ? '↑' : '↓'}
+            </Button>
+          </div>
         </div>
 
-        {/* Products Grid - using only existing props */}
+        {/* Products Grid/List */}
         <ProductGrid 
-          products={filteredProducts} 
-          loading={loading}
+          products={products} 
+          compact={viewMode === 'grid'} 
+          listView={viewMode === 'list'}
         />
-        
-        {/* Custom empty state when no products found */}
-        {!loading && filteredProducts.length === 0 && (
+
+        {products.length === 0 && (
           <div className="text-center py-16 animate-fade-in">
             <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
               <div className="w-16 h-16 text-white/50">📦</div>
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              Nenhum produto encontrado{searchTerm ? ` para "${searchTerm}"` : ''}
+              Nenhum produto encontrado
             </h2>
-            <p className="text-white/80">
-              Tente ajustar os filtros ou buscar por outros termos
+            <p className="text-white/80 mb-6">
+              Não há produtos disponíveis nesta categoria
             </p>
+            <Button onClick={() => navigate('/')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
+              Explorar Outros Materiais
+            </Button>
           </div>
         )}
       </div>

@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase } from 'lucide-react';
+import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,13 +13,13 @@ import { HeroSection } from '@/components/HeroSection';
 import { TabNavigation } from '@/components/TabNavigation';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductGrid } from '@/components/ProductGrid';
+import { useMostPurchased } from '@/hooks/useMostPurchased';
 import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -51,11 +50,10 @@ const Index = () => {
   const [showAnalysisModal, setShowAnalysisModal] = useState(false);
   const [questionnaireAnswers, setQuestionnaireAnswers] = useState<Record<string, string>>({});
   const [priceFilter, setPriceFilter] = useState<{ min: number; max: number }>({ min: 0, max: 1000 });
-
-  // Categorias carregadas dinamicamente da base de dados
   const [legalCategories, setLegalCategories] = useState<string[]>([]);
+  
+  const { data: mostPurchasedData } = useMostPurchased(8);
 
-  // Function to shuffle array - sempre randomizar
   const shuffleArray = <T,>(array: T[]): T[] => {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
@@ -65,7 +63,6 @@ const Index = () => {
     return shuffled;
   };
 
-  // Parse price from string to number
   const parsePrice = (priceString: string): number => {
     const cleanPrice = priceString.replace(/[^\d,]/g, '').replace(',', '.');
     return parseFloat(cleanPrice) || 0;
@@ -85,12 +82,10 @@ const Index = () => {
     filterProducts();
   }, [selectedCategory, filteredProducts, searchTerm, sortBy, sortOrder]);
 
-  // Apply price filter whenever priceFilter changes
   useEffect(() => {
     applyPriceFilter();
   }, [products, priceFilter]);
 
-  // Auto-rotate featured products by category every 15 seconds - only when not viewing specific category
   useEffect(() => {
     if (legalCategories.length > 0 && products.length > 0 && !categoryFromUrl) {
       const interval = setInterval(() => {
@@ -123,22 +118,18 @@ const Index = () => {
         product && product.produto && product.valor && product.imagem1
       ) as Product[];
       
-      // SEMPRE randomizar produtos a cada carregamento
       let processedProducts = shuffleArray(legalProducts);
       
       setProducts(processedProducts);
       
-      // Set initial featured products (first 8 randomizados)
       const initialFeatured = shuffleArray(processedProducts).slice(0, 8);
       setFeaturedProducts(initialFeatured);
 
-      // Buscar categorias reais da base de dados
       const uniqueCategories = [...new Set(legalProducts.map(p => p.categoria).filter(Boolean))];
       setCategories(['todas', ...uniqueCategories]);
 
       setLegalCategories(uniqueCategories);
       
-      // Set initial featured category
       if (legalCategories.length > 0) {
         setCurrentFeaturedCategory('Destaques Jurídicos');
       }
@@ -147,25 +138,6 @@ const Index = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const mapToLegalCategory = (originalCategory: string): string => {
-    const categoryMap: Record<string, string> = {
-      'Beleza e Cuidados Pessoais': 'Vestimentas Jurídicas',
-      'Casa e Decoração': 'Acessórios Profissionais',
-      'Diversão e Familia': 'Cursos e Preparatórios',
-      'Estilo e Moda': 'Vestimentas Jurídicas',
-      'Tecnologia e Acessórios': 'Materiais de Estudo'
-    };
-
-    // Se contém palavras relacionadas a livros/estudos
-    if (originalCategory.toLowerCase().includes('book') || 
-        originalCategory.toLowerCase().includes('livro') ||
-        originalCategory.toLowerCase().includes('estudo')) {
-      return 'Livros de Direito';
-    }
-
-    return categoryMap[originalCategory] || 'Livros de Direito';
   };
 
   const applyPriceFilter = () => {
@@ -189,7 +161,6 @@ const Index = () => {
       );
     }
 
-    // Aplicar ordenação
     filtered.sort((a, b) => {
       if (sortBy === 'nome') {
         const comparison = a.produto.localeCompare(b.produto);
@@ -217,7 +188,7 @@ const Index = () => {
     const productElement = document.getElementById(`product-${productId}`);
     if (productElement) {
       productElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      setSearchTerm(''); // Clear search to hide preview
+      setSearchTerm('');
     }
   };
 
@@ -281,6 +252,16 @@ const Index = () => {
   const getCategoryProducts = (category: string, limit: number = 12) => {
     const categoryProducts = filteredProducts.filter(p => p.categoria === category);
     return shuffleArray(categoryProducts).slice(0, limit);
+  };
+
+  const getMostPurchasedProducts = () => {
+    if (!mostPurchasedData || mostPurchasedData.length === 0) {
+      return shuffleArray(featuredProducts).slice(0, 8);
+    }
+    
+    const productIds = mostPurchasedData.map(p => p.product_id);
+    const purchasedProducts = products.filter(p => productIds.includes(p.id));
+    return purchasedProducts.slice(0, 8);
   };
 
   if (loading) {
@@ -352,6 +333,57 @@ const Index = () => {
 
       {/* Hero Section */}
       <HeroSection productsCount={filteredProducts.length} />
+
+      {/* Most Purchased Section - NEW */}
+      <section className="px-4 md:px-6 py-6 animate-fade-in bg-gradient-to-r from-green-900/30 to-blue-900/30 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-green-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <TrendingUp className="w-4 h-4 text-green-300" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">📈 Mais Comprados</h3>
+                <p className="text-xs text-white/70">Os materiais preferidos dos juristas</p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => navigate('/mais-comprados')}
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30 text-xs px-3 py-1 h-auto"
+            >
+              Ver Ranking
+              <ArrowRight className="w-3 h-3 ml-1" />
+            </Button>
+          </div>
+          
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-3">
+              {getMostPurchasedProducts().map((product, index) => (
+                <CarouselItem 
+                  key={product.id} 
+                  className="pl-2 md:pl-3 basis-1/2 md:basis-1/3 lg:basis-1/4 xl:basis-1/6"
+                >
+                  <div className="relative">
+                    <ProductCard 
+                      product={product} 
+                      compact={true}
+                      showBadge={true}
+                      badgeText="TOP"
+                    />
+                    <div className="absolute top-2 left-2 w-6 h-6 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xs">
+                      {index + 1}
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2 md:left-4 bg-white/90 hover:bg-white border-green-200 w-6 h-6" />
+            <CarouselNext className="right-2 md:right-4 bg-white/90 hover:bg-white border-green-200 w-6 h-6" />
+          </Carousel>
+        </div>
+      </section>
 
       {/* Category Product Carousels - show all categories when not in AI mode */}
       {!showingAI && legalCategories.map((category, index) => {
@@ -467,7 +499,6 @@ const Index = () => {
             </>
           ) : (
             <>
-              {/* CAROUSEL COM CARDS COMPACTOS - ALTERAÇÃO PRINCIPAL */}
               <Carousel className="w-full animate-scale-in mb-6">
                 <CarouselContent className="-ml-2 md:-ml-3">
                   {featuredProducts.map((product, index) => (
@@ -564,7 +595,11 @@ const Index = () => {
               </Select>
             </div>
 
-            <ProductGrid products={displayedProducts.slice(0, 24)} compact={true} />
+            <ProductGrid 
+              products={displayedProducts.slice(0, 24)} 
+              compact={true} 
+              listView={false}
+            />
 
             {displayedProducts.length === 0 && (
               <div className="text-center py-16 animate-fade-in">
@@ -591,7 +626,7 @@ const Index = () => {
             {displayedProducts.length > 24 && (
               <div className="text-center mt-8 animate-fade-in">
                 <Button 
-                  onClick={() => navigate(`/categoria-lista?categoria=${selectedCategory}&tipo=categoria`)}
+                  onClick={() => navigate(`/categoria-lista?categoria=${selectedCategory}&tipo=categoria&view=list`)}
                   className="bg-white text-blue-900 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105"
                 >
                   Ver Todos os {displayedProducts.length} Materiais

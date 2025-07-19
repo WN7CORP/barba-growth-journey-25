@@ -1,12 +1,14 @@
 
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Star, ShoppingBag, Sparkles, Eye } from 'lucide-react';
+import { ArrowLeft, TrendingUp, ShoppingBag, Star } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Header from '@/components/Header';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
+import { useMostPurchased } from '@/hooks/useMostPurchased';
+import { usePurchaseTracker } from '@/hooks/usePurchaseTracker';
 import { OptimizedImage } from '@/components/OptimizedImage';
 
 interface Product {
@@ -23,62 +25,82 @@ interface Product {
   descricao?: string;
 }
 
-const Novos = () => {
+const MaisComprados = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const navigate = useNavigate();
+  const { data: mostPurchased, isLoading: purchasedLoading } = useMostPurchased(50);
+  const { trackPurchase, trackClick } = usePurchaseTracker();
 
   useEffect(() => {
-    fetchNewestProducts();
-  }, []);
+    fetchMostPurchasedProducts();
+  }, [mostPurchased]);
 
-  const fetchNewestProducts = async () => {
+  const fetchMostPurchasedProducts = async () => {
     try {
-      // @ts-ignore - Bypass TypeScript for table name  
-      const { data, error } = await (supabase as any)
-        .from('MUNDODODIREITO')
-        .select('*')
-        .order('id', { ascending: false })
-        .limit(50);
+      if (mostPurchased && mostPurchased.length > 0) {
+        // Get products based on most purchased IDs
+        const productIds = mostPurchased.map(p => p.product_id);
+        
+        // @ts-ignore - Bypass TypeScript for table name
+        const { data, error } = await (supabase as any)
+          .from('MUNDODODIREITO')
+          .select('*')
+          .in('id', productIds);
 
-      if (error) throw error;
-      // @ts-ignore - Bypass TypeScript for data casting
-      setProducts(data || []);
+        if (error) throw error;
+        
+        // Sort products based on purchase count
+        const sortedProducts = (data || []).sort((a: Product, b: Product) => {
+          const aPurchases = mostPurchased.find(p => p.product_id === a.id)?.purchase_count || 0;
+          const bPurchases = mostPurchased.find(p => p.product_id === b.id)?.purchase_count || 0;
+          return bPurchases - aPurchases;
+        });
+        
+        setProducts(sortedProducts);
+      } else {
+        // Fallback to random products if no purchase data
+        // @ts-ignore - Bypass TypeScript for table name
+        const { data, error } = await (supabase as any)
+          .from('MUNDODODIREITO')
+          .select('*')
+          .limit(30);
+
+        if (error) throw error;
+        setProducts(data || []);
+      }
     } catch (error) {
-      console.error('Erro ao buscar produtos novos:', error);
+      console.error('Erro ao buscar produtos mais comprados:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const formatPrice = (price: string | null) => {
-    if (!price) {
-      return 'Preço não disponível';
-    }
-    if (price.includes('R$')) {
-      return price;
-    }
+    if (!price) return 'Preço não disponível';
+    if (price.includes('R$')) return price;
     return `R$ ${price}`;
   };
 
   const handleProductClick = (product: Product) => {
+    trackClick(product.id);
     setSelectedProduct(product);
     setIsDetailModalOpen(true);
   };
 
-  const getProductImages = (product: Product) => {
-    return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
+  const handlePurchaseClick = async (product: Product, e: React.MouseEvent) => {
+    e.stopPropagation();
+    await trackPurchase(product);
+    window.open(product.link, '_blank', 'noopener,noreferrer');
   };
 
-  // Simulate rating (in a real app, this would come from database)
-  const getSimulatedRating = (productId: number) => {
-    const ratings = [4.2, 4.5, 4.8, 4.3, 4.7, 4.1, 4.9, 4.4, 4.6, 4.0];
-    return ratings[productId % ratings.length];
+  const getPurchaseCount = (productId: number) => {
+    return mostPurchased?.find(p => p.product_id === productId)?.purchase_count || 0;
   };
 
-  if (loading) {
+  if (loading || purchasedLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
@@ -113,11 +135,11 @@ const Novos = () => {
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left flex items-center gap-3">
-              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
-              📚 Lançamentos Jurídicos
+              <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
+              📈 Mais Comprados
             </h1>
             <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
-              Os {products.length} livros e materiais mais recentes da nossa livraria
+              Os {products.length} materiais jurídicos mais procurados pelos profissionais
             </p>
           </div>
         </div>
@@ -125,13 +147,13 @@ const Novos = () => {
         {products.length === 0 ? (
           <div className="text-center py-16 animate-fade-in">
             <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-              <Sparkles className="w-16 h-16 text-white/50" />
+              <TrendingUp className="w-16 h-16 text-white/50" />
             </div>
             <h2 className="text-2xl font-bold text-white mb-4">
-              Nenhum lançamento ainda
+              Ainda coletando dados de compras
             </h2>
             <p className="text-white/80 mb-6">
-              Novos materiais jurídicos serão exibidos aqui em breve
+              Em breve você verá os materiais mais comprados aqui
             </p>
             <Button onClick={() => navigate('/')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
               Explorar Livraria
@@ -140,7 +162,7 @@ const Novos = () => {
         ) : (
           <div className="space-y-4 md:space-y-6">
             {products.map((product, index) => {
-              const rating = getSimulatedRating(product.id);
+              const purchaseCount = getPurchaseCount(product.id);
               
               return (
                 <div 
@@ -150,7 +172,12 @@ const Novos = () => {
                   onClick={() => handleProductClick(product)}
                 >
                   <div className="flex gap-4 md:gap-6">
-                    {/* Enhanced Thumbnail */}
+                    {/* Ranking Badge */}
+                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      {index + 1}
+                    </div>
+                    
+                    {/* Product Image */}
                     <div className="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 rounded-xl overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
                       <OptimizedImage 
                         src={product.imagem1} 
@@ -164,9 +191,14 @@ const Novos = () => {
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs animate-pulse">
-                              LANÇAMENTO
+                            <Badge className="bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold text-xs animate-pulse">
+                              MAIS COMPRADO
                             </Badge>
+                            {purchaseCount > 0 && (
+                              <Badge variant="secondary" className="text-xs bg-white/20 text-green-300 border-green-400/30">
+                                {purchaseCount} compras
+                              </Badge>
+                            )}
                             <Badge variant="secondary" className="text-xs bg-white/20 text-purple-300 border-purple-400/30">
                               {product.categoria}
                             </Badge>
@@ -176,62 +208,36 @@ const Novos = () => {
                             {product.produto}
                           </h3>
                           
-                          {/* Rating */}
+                          {/* Rating Simulation */}
                           <div className="flex items-center gap-2 mb-3">
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star 
                                   key={star} 
-                                  className={`w-3 h-3 md:w-4 md:h-4 ${
-                                    star <= Math.floor(rating) 
-                                      ? 'text-yellow-400 fill-yellow-400' 
-                                      : star <= rating 
-                                        ? 'text-yellow-400 fill-yellow-400/50' 
-                                        : 'text-white/30'
-                                  }`} 
+                                  className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 fill-yellow-400" 
                                 />
                               ))}
                             </div>
                             <span className="text-white/80 text-xs md:text-sm font-medium">
-                              {rating.toFixed(1)} • {Math.floor(Math.random() * 150) + 10} avaliações
+                              4.8 • {purchaseCount || Math.floor(Math.random() * 100) + 20} avaliações
                             </span>
                           </div>
                           
-                          <div className="text-amber-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-amber-300 transition-colors">
+                          <div className="text-green-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-green-300 transition-colors">
                             {formatPrice(product.valor)}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <div className="flex items-center gap-1 text-white/60 text-xs md:text-sm">
-                            <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                            <span>{Math.floor(Math.random() * 500) + 50}</span>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+                      {/* Action Button */}
+                      <div className="flex items-center gap-2 md:gap-3">
                         <Button 
                           size="sm" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProductClick(product);
-                          }}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                          onClick={(e) => handlePurchaseClick(product, e)}
+                          className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-xs md:text-sm px-4 md:px-6 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                         >
-                          Ver detalhes
-                        </Button>
-                        
-                        <Button 
-                          size="sm" 
-                          asChild 
-                          className="bg-green-500 hover:bg-green-600 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                        >
-                          <a href={product.link} target="_blank" rel="noopener noreferrer">
-                            <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                            Comprar agora
-                          </a>
+                          <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 mr-2" />
+                          Comprar Agora
                         </Button>
                       </div>
                     </div>
@@ -255,4 +261,4 @@ const Novos = () => {
   );
 };
 
-export default Novos;
+export default MaisComprados;
