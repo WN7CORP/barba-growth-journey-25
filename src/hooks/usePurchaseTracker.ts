@@ -47,7 +47,7 @@ export const usePurchaseTracker = () => {
         .from('product_clicks')
         .insert({
           product_id: productId,
-          user_device_id: deviceId
+          device_id: deviceId
         });
 
       if (error) {

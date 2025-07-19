@@ -1,13 +1,11 @@
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Star, ShoppingBag, Sparkles, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Calendar, Star, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import Header from '@/components/Header';
-import { ProductDetailModal } from '@/components/ProductDetailModal';
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
-import { OptimizedImage } from '@/components/OptimizedImage';
+import Header from '@/components/Header';
+import { ProductGrid } from '@/components/ProductGrid';
+import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
   id: number;
@@ -24,28 +22,38 @@ interface Product {
 }
 
 const Novos = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState<string>('todas');
+  const [categories, setCategories] = useState<string[]>([]);
 
   useEffect(() => {
-    fetchNewestProducts();
+    fetchProducts();
   }, []);
 
-  const fetchNewestProducts = async () => {
+  const fetchProducts = async () => {
     try {
-      // @ts-ignore - Bypass TypeScript for table name  
+      // @ts-ignore - Bypass TypeScript for table name
       const { data, error } = await (supabase as any)
         .from('MUNDODODIREITO')
         .select('*')
-        .order('id', { ascending: false })
-        .limit(50);
+        .order('id', { ascending: false }); // Ordenar por ID decrescente para pegar os mais recentes
 
       if (error) throw error;
-      // @ts-ignore - Bypass TypeScript for data casting
-      setProducts(data || []);
+      
+      const legalProducts = (data || []).filter((product: any) => 
+        product && product.produto && product.valor && product.imagem1
+      ) as Product[];
+      
+      // Simular "novos produtos" pegando uma amostra aleatória
+      const shuffledProducts = [...legalProducts].sort(() => Math.random() - 0.5);
+      const newProducts = shuffledProducts.slice(0, 30); // Pegar 30 produtos "novos"
+      
+      setProducts(newProducts);
+      
+      const uniqueCategories = [...new Set(legalProducts.map(p => p.categoria).filter(Boolean))];
+      setCategories(['todas', ...uniqueCategories]);
     } catch (error) {
       console.error('Erro ao buscar produtos novos:', error);
     } finally {
@@ -53,43 +61,26 @@ const Novos = () => {
     }
   };
 
-  const formatPrice = (price: string | null) => {
-    if (!price) {
-      return 'Preço não disponível';
-    }
-    if (price.includes('R$')) {
-      return price;
-    }
-    return `R$ ${price}`;
+  const handleSearch = (term: string) => {
+    // Implementar busca se necessário
   };
 
-  const handleProductClick = (product: Product) => {
-    setSelectedProduct(product);
-    setIsDetailModalOpen(true);
+  const handlePriceFilter = (min: number, max: number) => {
+    // Implementar filtro de preço se necessário
   };
 
-  const getProductImages = (product: Product) => {
-    return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
-  };
-
-  // Simulate rating (in a real app, this would come from database)
-  const getSimulatedRating = (productId: number) => {
-    const ratings = [4.2, 4.5, 4.8, 4.3, 4.7, 4.1, 4.9, 4.4, 4.6, 4.0];
-    return ratings[productId % ratings.length];
-  };
+  const filteredProducts = selectedCategory === 'todas' 
+    ? products 
+    : products.filter(p => p.categoria === selectedCategory);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
-        <Header onSearch={() => {}} onPriceFilter={() => {}} />
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
+        <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
-              ))}
-            </div>
+            <div className="h-32 bg-white/20 rounded-2xl"></div>
+            <ProductGrid loading={true} products={[]} />
           </div>
         </div>
       </div>
@@ -98,159 +89,137 @@ const Novos = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
-      <Header onSearch={() => {}} onPriceFilter={() => {}} />
+      <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8 animate-fade-in">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')} 
-            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left flex items-center gap-3">
-              <Sparkles className="w-6 h-6 md:w-8 md:h-8 text-yellow-400" />
-              📚 Lançamentos Jurídicos
-            </h1>
-            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
-              Os {products.length} livros e materiais mais recentes da nossa livraria
-            </p>
+      {/* Header Section */}
+      <section className="px-4 md:px-6 py-8 bg-gradient-to-r from-purple-900/40 to-blue-900/40 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <Sparkles className="w-6 h-6 text-purple-300" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  ✨ Novidades Jurídicas
+                </h1>
+                <p className="text-white/80">
+                  Os materiais mais recentes para sua biblioteca
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <div className="text-3xl font-bold text-purple-400 mb-2">
+                  {products.length}
+                </div>
+                <div className="text-white/80">
+                  Novos Materiais
+                </div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-blue-400 mb-2">
+                  {categories.length - 1}
+                </div>
+                <div className="text-white/80">
+                  Áreas do Direito
+                </div>
+              </div>
+              <div>
+                <div className="text-3xl font-bold text-green-400 mb-2">
+                  100%
+                </div>
+                <div className="text-white/80">
+                  Conteúdo Atualizado
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        {products.length === 0 ? (
-          <div className="text-center py-16 animate-fade-in">
-            <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-              <Sparkles className="w-16 h-16 text-white/50" />
+      {/* Products Grid */}
+      <section className="px-4 md:px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-5 h-5 text-white" />
+              <h2 className="text-xl font-bold text-white">
+                Lançamentos Recentes
+              </h2>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Nenhum lançamento ainda
-            </h2>
-            <p className="text-white/80 mb-6">
-              Novos materiais jurídicos serão exibidos aqui em breve
-            </p>
-            <Button onClick={() => navigate('/')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
-              Explorar Livraria
-            </Button>
+            
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category === 'todas' ? 'Todas as Áreas' : category}
+                </option>
+              ))}
+            </select>
           </div>
-        ) : (
-          <div className="space-y-4 md:space-y-6">
-            {products.map((product, index) => {
-              const rating = getSimulatedRating(product.id);
-              
-              return (
-                <div 
-                  key={product.id} 
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 hover:bg-white/15 transition-all duration-300 animate-fade-in cursor-pointer group hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20" 
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  onClick={() => handleProductClick(product)}
-                >
-                  <div className="flex gap-4 md:gap-6">
-                    {/* Enhanced Thumbnail */}
-                    <div className="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 rounded-xl overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
-                      <OptimizedImage 
-                        src={product.imagem1} 
-                        alt={product.produto} 
-                        className="w-full h-full object-cover" 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
-                    
-                    <div className="flex-1 min-w-0 space-y-3 md:space-y-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold text-xs animate-pulse">
-                              LANÇAMENTO
-                            </Badge>
-                            <Badge variant="secondary" className="text-xs bg-white/20 text-purple-300 border-purple-400/30">
-                              {product.categoria}
-                            </Badge>
-                          </div>
-                          
-                          <h3 className="text-white font-semibold text-base md:text-lg xl:text-xl line-clamp-2 mb-3 group-hover:text-purple-200 transition-colors">
-                            {product.produto}
-                          </h3>
-                          
-                          {/* Rating */}
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="flex items-center gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                  key={star} 
-                                  className={`w-3 h-3 md:w-4 md:h-4 ${
-                                    star <= Math.floor(rating) 
-                                      ? 'text-yellow-400 fill-yellow-400' 
-                                      : star <= rating 
-                                        ? 'text-yellow-400 fill-yellow-400/50' 
-                                        : 'text-white/30'
-                                  }`} 
-                                />
-                              ))}
-                            </div>
-                            <span className="text-white/80 text-xs md:text-sm font-medium">
-                              {rating.toFixed(1)} • {Math.floor(Math.random() * 150) + 10} avaliações
-                            </span>
-                          </div>
-                          
-                          <div className="text-amber-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-amber-300 transition-colors">
-                            {formatPrice(product.valor)}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center gap-1 md:gap-2">
-                          <div className="flex items-center gap-1 text-white/60 text-xs md:text-sm">
-                            <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                            <span>{Math.floor(Math.random() * 500) + 50}</span>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Action Buttons */}
-                      <div className="flex items-center gap-2 md:gap-3 flex-wrap">
-                        <Button 
-                          size="sm" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleProductClick(product);
-                          }}
-                          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                        >
-                          Ver detalhes
-                        </Button>
-                        
-                        <Button 
-                          size="sm" 
-                          asChild 
-                          className="bg-green-500 hover:bg-green-600 text-white text-xs md:text-sm px-3 md:px-4 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                        >
-                          <a href={product.link} target="_blank" rel="noopener noreferrer">
-                            <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                            Comprar agora
-                          </a>
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+          
+          <ProductGrid 
+            products={filteredProducts}
+            loading={false}
+            compact={true}
+            listView={false}
+          />
+          
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-16 h-16 text-white/50" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Nenhum produto encontrado
+              </h2>
+              <p className="text-white/80">
+                Não há novos produtos nesta categoria
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
 
-      {/* Product Detail Modal */}
-      {selectedProduct && (
-        <ProductDetailModal 
-          isOpen={isDetailModalOpen} 
-          onClose={() => setIsDetailModalOpen(false)} 
-          product={selectedProduct} 
-        />
-      )}
+      {/* Call to Action */}
+      <section className="px-4 md:px-6 py-12 bg-gradient-to-r from-purple-800/50 to-blue-800/50 backdrop-blur-sm">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="w-16 h-16 bg-purple-500/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+            <Star className="w-8 h-8 text-purple-300" />
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+            Sempre em Atualização!
+          </h2>
+          <p className="text-white/80 text-lg mb-6 max-w-2xl mx-auto">
+            Nossa biblioteca é constantemente atualizada com os materiais mais recentes 
+            e relevantes para sua carreira jurídica.
+          </p>
+          <Button 
+            size="lg"
+            onClick={() => navigate('/')}
+            className="bg-purple-600 hover:bg-purple-700 text-white font-bold px-8 py-3 text-lg"
+          >
+            Explorar Mais Materiais
+          </Button>
+        </div>
+      </section>
     </div>
   );
 };

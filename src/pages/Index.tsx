@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';

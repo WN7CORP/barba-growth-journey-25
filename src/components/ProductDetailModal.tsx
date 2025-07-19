@@ -6,8 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { X, ShoppingCart, Heart, Star, Play, Info, Sparkles } from 'lucide-react';
-import { ProductVideoModal } from '@/components/ProductVideoModal';
+import { X, ShoppingCart, Star, Info, Sparkles } from 'lucide-react';
 import { ProductBreadcrumb } from '@/components/ProductBreadcrumb';
 import { ShareButton } from '@/components/ShareButton';
 import { FavoriteButton } from '@/components/FavoriteButton';
@@ -17,7 +16,6 @@ interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -39,7 +37,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   product
 }) => {
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
 
   useEffect(() => {
@@ -99,51 +96,51 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const rating = getSimulatedRating(product.id);
 
   return (
-    <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-6xl w-[95vw] max-h-[95vh] overflow-hidden p-0 bg-white">
-          {/* Header with breadcrumb - Mobile Optimized */}
-          <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white">
-            <div className="flex items-center justify-between p-3 md:p-4">
-              <div className="flex-1 pr-3 md:pr-4 min-w-0">
-                <h2 className="text-sm md:text-lg font-bold line-clamp-2 mb-1">
-                  {product.produto}
-                </h2>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge className="bg-white/20 text-white border-white/30 text-xs">
-                    {product.categoria}
-                  </Badge>
-                  <div className="flex items-center gap-1">
-                    <Star className="w-3 h-3 text-yellow-300 fill-current" />
-                    <span className="text-xs">{rating.toFixed(1)}</span>
-                  </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="w-full max-w-full sm:max-w-2xl md:max-w-4xl lg:max-w-6xl h-full max-h-[100vh] sm:max-h-[95vh] overflow-hidden p-0 bg-white m-0 sm:m-2">
+        {/* Header with breadcrumb - Mobile Optimized */}
+        <div className="bg-gradient-to-r from-blue-800 to-purple-800 text-white">
+          <div className="flex items-center justify-between p-3 md:p-4">
+            <div className="flex-1 pr-3 md:pr-4 min-w-0">
+              <h2 className="text-sm md:text-lg font-bold line-clamp-2 mb-1">
+                {product.produto}
+              </h2>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge className="bg-white/20 text-white border-white/30 text-xs">
+                  {product.categoria}
+                </Badge>
+                <div className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-yellow-300 fill-current" />
+                  <span className="text-xs">{rating.toFixed(1)}</span>
                 </div>
               </div>
-              <Button
-                onClick={onClose}
-                variant="ghost" 
-                size="sm"
-                className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-8 h-8 md:w-10 md:h-10 p-0 flex-shrink-0"
-              >
-                <X className="w-4 h-4 md:w-5 md:h-5" />
-              </Button>
             </div>
-            <div className="px-3 md:px-4">
-              <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
-            </div>
+            <Button
+              onClick={onClose}
+              variant="ghost" 
+              size="sm"
+              className="text-white hover:bg-red-500/80 bg-red-500/60 border border-white/50 rounded-full w-8 h-8 md:w-10 md:h-10 p-0 flex-shrink-0"
+            >
+              <X className="w-4 h-4 md:w-5 md:h-5" />
+            </Button>
           </div>
+          <div className="px-3 md:px-4 pb-2">
+            <ProductBreadcrumb categoria={product.categoria} produto={product.produto} />
+          </div>
+        </div>
 
-          {/* Layout principal - Mobile First */}
-          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 overflow-y-auto max-h-[calc(95vh-140px)]">
+        {/* Main Content - Mobile First Layout */}
+        <div className="flex flex-col h-full overflow-y-auto">
+          <div className="flex flex-col md:flex-row gap-4 md:gap-6 p-4 md:p-6">
             
-            {/* Galeria - Full width on mobile, 1/3 on desktop */}
-            <div className="lg:col-span-1">
-              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner aspect-[2/3]">
-                <Carousel className="w-full h-full">
+            {/* Image Gallery - Full width on mobile, 1/3 on desktop */}
+            <div className="w-full md:w-1/3 flex-shrink-0">
+              <div className="relative bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg overflow-hidden shadow-inner">
+                <Carousel className="w-full">
                   <CarouselContent>
                     {getProductImages().map((image, index) => (
                       <CarouselItem key={index}>
-                        <div className="h-full">
+                        <div className="aspect-[3/4] sm:aspect-[2/3]">
                           <img
                             src={image}
                             alt={`${product.produto} - ${index + 1}`}
@@ -158,7 +155,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 </Carousel>
               </div>
 
-              {/* Miniaturas */}
+              {/* Thumbnails */}
               <div className="flex gap-1 mt-2 overflow-x-auto pb-1">
                 {getProductImages().map((image, index) => (
                   <div
@@ -175,16 +172,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
             </div>
 
-            {/* Informações - Full width on mobile, 2/3 on desktop */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6">
+            {/* Product Information - Full width on mobile, 2/3 on desktop */}
+            <div className="w-full md:w-2/3 space-y-4 md:space-y-6">
               
-              {/* Preço e ações */}
+              {/* Price and Actions */}
               <div className="bg-gradient-to-r from-red-50 to-pink-50 p-4 rounded-xl border border-red-100">
                 <div className="text-sm text-gray-600 mb-1 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-purple-600" />
                   💰 Oferta especial
                 </div>
-                <div className="text-2xl md:text-3xl font-bold text-red-600 mb-4">
+                <div className="text-xl md:text-2xl lg:text-3xl font-bold text-red-600 mb-4">
                   {formatPrice(product.valor)}
                 </div>
                 
@@ -199,24 +196,20 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   />
                   <Button
                     onClick={handleBuyClick}
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg text-sm md:text-base"
+                    className="flex-1 min-w-0 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg text-sm md:text-base px-4 py-2"
                   >
-                    <ShoppingCart className="w-4 h-4 mr-2" />
-                    Comprar Agora
+                    <ShoppingCart className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span className="truncate">Comprar Agora</span>
                   </Button>
                 </div>
               </div>
 
-              {/* Tabs de conteúdo */}
+              {/* Content Tabs */}
               <Tabs defaultValue="description" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-gray-100 p-1 rounded-xl">
+                <TabsList className="grid w-full grid-cols-1 bg-gray-100 p-1 rounded-xl">
                   <TabsTrigger value="description" className="text-sm font-medium rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
                     <Info className="w-4 h-4 mr-2" />
-                    Informações
-                  </TabsTrigger>
-                  <TabsTrigger value="video" className="text-sm font-medium rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-                    <Play className="w-4 h-4 mr-2" />
-                    Vídeo
+                    Informações Detalhadas
                   </TabsTrigger>
                 </TabsList>
                 
@@ -242,49 +235,6 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     </CardContent>
                   </Card>
                 </TabsContent>
-                
-                <TabsContent value="video" className="mt-4">
-                  <Card className="border-0 shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                          <Play className="w-5 h-5 text-red-600" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-base text-gray-900">Vídeo Demonstrativo</h3>
-                          <p className="text-sm text-gray-600">Conheça mais sobre o produto</p>
-                        </div>
-                      </div>
-                      
-                      {product.video ? (
-                        <div className="bg-gradient-to-br from-red-50 to-orange-50 p-4 rounded-xl border border-red-200">
-                          <Button
-                            onClick={() => setIsVideoOpen(true)}
-                            className="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-bold py-3 rounded-xl shadow-lg"
-                          >
-                            <Play className="w-5 h-5 mr-3" />
-                            ▶️ Assistir Vídeo
-                          </Button>
-                          <p className="text-xs text-gray-600 text-center mt-2">
-                            Duração: 2-5 min
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200 text-center">
-                          <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                            <Play className="w-6 h-6 text-gray-400" />
-                          </div>
-                          <p className="text-gray-600 font-medium">
-                            Vídeo não disponível
-                          </p>
-                          <p className="text-sm text-gray-500 mt-1">
-                            Verifique as imagens acima
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </TabsContent>
               </Tabs>
 
               {/* Related Products */}
@@ -294,7 +244,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     <Sparkles className="w-5 h-5 text-purple-600" />
                     Produtos Relacionados
                   </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
                     {relatedProducts.map((relatedProduct) => (
                       <div key={relatedProduct.id} className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-shadow cursor-pointer">
                         <img 
@@ -315,20 +265,8 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-
-      {product.video && (
-        <ProductVideoModal
-          isOpen={isVideoOpen}
-          onClose={() => setIsVideoOpen(false)}
-          videoUrl={product.video}
-          productName={product.produto}
-          productPrice={formatPrice(product.valor)}
-          productLink={product.link}
-          productImages={getProductImages()}
-        />
-      )}
-    </>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };

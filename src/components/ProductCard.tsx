@@ -1,11 +1,10 @@
 
 import React, { useState, memo, useCallback } from 'react';
-import { Star, Play, Scale, BookOpen, GraduationCap, ShoppingBag } from 'lucide-react';
+import { Star, Scale, BookOpen, GraduationCap, ShoppingBag } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { ProductPhotosModal } from '@/components/ProductPhotosModal';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { LazyImage } from '@/components/LazyImage';
@@ -14,7 +13,6 @@ interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -34,6 +32,7 @@ interface ProductCardProps {
   selected?: boolean;
   onToggle?: (product: Product) => void;
   style?: React.CSSProperties;
+  listLayout?: boolean;
 }
 
 const ProductCardComponent: React.FC<ProductCardProps> = ({
@@ -44,7 +43,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   selectable = false,
   selected = false,
   onToggle,
-  style
+  style,
+  listLayout = false
 }) => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -96,6 +96,43 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   const images = getProductImages(product);
   const CategoryIcon = getCategoryIcon(product.categoria);
 
+  if (listLayout) {
+    return (
+      <>
+        <div className="flex gap-4 p-4 bg-white rounded-lg hover:shadow-md transition-all cursor-pointer" onClick={handleCardClick}>
+          <div className="w-20 h-24 flex-shrink-0">
+            <img 
+              src={product.imagem1} 
+              alt={product.produto}
+              className="w-full h-full object-cover rounded"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 line-clamp-2 mb-2">
+              {product.produto}
+            </h3>
+            <Badge variant="secondary" className="mb-2">
+              {product.categoria}
+            </Badge>
+            <div className="flex items-center justify-between">
+              <div className="font-bold text-red-600">
+                {formatPrice(product.valor)}
+              </div>
+              <Button size="sm" onClick={handleVerMaisClick}>
+                Ver mais
+              </Button>
+            </div>
+          </div>
+        </div>
+        <ProductDetailModal 
+          isOpen={isDetailModalOpen} 
+          onClose={() => setIsDetailModalOpen(false)} 
+          product={product} 
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <Card 
@@ -113,12 +150,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-          <div className="aspect-[3/4] overflow-hidden">
-                     <LazyImage 
-                       src={image} 
-                       alt={`${product.produto} - ${index + 1}`}
-                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                     />
+                  <div className="aspect-[3/4] overflow-hidden">
+                    <LazyImage 
+                      src={image} 
+                      alt={`${product.produto} - ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
                   </div>
                 </CarouselItem>
               ))}
@@ -126,14 +163,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselPrevious className={`carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
             <CarouselNext className={`carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
           </Carousel>
-          
-          {product.video && (
-            <div className={`absolute ${compact ? 'top-1 right-1' : 'top-2 right-2'}`}>
-              <div className="bg-red-600/90 rounded-full p-1.5 shadow-lg animate-pulse">
-                <Play className="w-3 h-3 text-white" />
-              </div>
-            </div>
-          )}
           
           {showBadge && (
             <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>

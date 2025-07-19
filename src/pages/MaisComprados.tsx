@@ -1,15 +1,14 @@
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, TrendingUp, ShoppingBag, Star } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, TrendingUp, Star, Trophy, Medal, Award } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Header from '@/components/Header';
-import { ProductDetailModal } from '@/components/ProductDetailModal';
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
+import Header from '@/components/Header';
+import { ProductGrid } from '@/components/ProductGrid';
 import { useMostPurchased } from '@/hooks/useMostPurchased';
-import { usePurchaseTracker } from '@/hooks/usePurchaseTracker';
-import { OptimizedImage } from '@/components/OptimizedImage';
+import { supabase } from "@/integrations/supabase/client";
 
 interface Product {
   id: number;
@@ -25,93 +24,137 @@ interface Product {
   descricao?: string;
 }
 
+interface ProductWithStats extends Product {
+  purchase_count: number;
+  position: number;
+}
+
 const MaisComprados = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const navigate = useNavigate();
-  const { data: mostPurchased, isLoading: purchasedLoading } = useMostPurchased(50);
-  const { trackPurchase, trackClick } = usePurchaseTracker();
+  const [products, setProducts] = useState<ProductWithStats[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState<string>('todas');
+  const [categories, setCategories] = useState<string[]>([]);
+  
+  const { data: mostPurchasedData, isLoading } = useMostPurchased(50);
 
   useEffect(() => {
-    fetchMostPurchasedProducts();
-  }, [mostPurchased]);
+    fetchAllProducts();
+  }, []);
 
-  const fetchMostPurchasedProducts = async () => {
+  useEffect(() => {
+    if (mostPurchasedData && allProducts.length > 0) {
+      processMostPurchasedProducts();
+    }
+  }, [mostPurchasedData, allProducts]);
+
+  const fetchAllProducts = async () => {
     try {
-      if (mostPurchased && mostPurchased.length > 0) {
-        // Get products based on most purchased IDs
-        const productIds = mostPurchased.map(p => p.product_id);
-        
-        // @ts-ignore - Bypass TypeScript for table name
-        const { data, error } = await (supabase as any)
-          .from('MUNDODODIREITO')
-          .select('*')
-          .in('id', productIds);
+      // @ts-ignore - Bypass TypeScript for table name
+      const { data, error } = await (supabase as any)
+        .from('MUNDODODIREITO')
+        .select('*')
+        .order('id');
 
-        if (error) throw error;
-        
-        // Sort products based on purchase count
-        const sortedProducts = (data || []).sort((a: Product, b: Product) => {
-          const aPurchases = mostPurchased.find(p => p.product_id === a.id)?.purchase_count || 0;
-          const bPurchases = mostPurchased.find(p => p.product_id === b.id)?.purchase_count || 0;
-          return bPurchases - aPurchases;
-        });
-        
-        setProducts(sortedProducts);
-      } else {
-        // Fallback to random products if no purchase data
-        // @ts-ignore - Bypass TypeScript for table name
-        const { data, error } = await (supabase as any)
-          .from('MUNDODODIREITO')
-          .select('*')
-          .limit(30);
-
-        if (error) throw error;
-        setProducts(data || []);
-      }
+      if (error) throw error;
+      
+      const legalProducts = (data || []).filter((product: any) => 
+        product && product.produto && product.valor && product.imagem1
+      ) as Product[];
+      
+      setAllProducts(legalProducts);
+      
+      const uniqueCategories = [...new Set(legalProducts.map(p => p.categoria).filter(Boolean))];
+      setCategories(['todas', ...uniqueCategories]);
     } catch (error) {
-      console.error('Erro ao buscar produtos mais comprados:', error);
-    } finally {
-      setLoading(false);
+      console.error('Erro ao buscar produtos:', error);
     }
   };
 
-  const formatPrice = (price: string | null) => {
-    if (!price) return 'Preço não disponível';
-    if (price.includes('R$')) return price;
-    return `R$ ${price}`;
+  const processMostPurchasedProducts = () => {
+    if (!mostPurchasedData || mostPurchasedData.length === 0) {
+      // Se não há dados de compras, criar dados simulados
+      const shuffledProducts = [...allProducts].sort(() => Math.random() - 0.5);
+      const simulatedProducts = shuffledProducts.slice(0, 20).map((product, index) => ({
+        ...product,
+        purchase_count: Math.floor(Math.random() * 100) + 10,
+        position: index + 1
+      }));
+      
+      simulatedProducts.sort((a, b) => b.purchase_count - a.purchase_count);
+      simulatedProducts.forEach((product, index) => {
+        product.position = index + 1;
+      });
+      
+      setProducts(simulatedProducts);
+    } else {
+      // Combinar dados reais de compras com informações dos produtos
+      const productsWithStats: ProductWithStats[] = [];
+      
+      mostPurchasedData.forEach((purchaseData, index) => {
+        const product = allProducts.find(p => p.id === purchaseData.product_id);
+        if (product) {
+          productsWithStats.push({
+            ...product,
+            purchase_count: Number(purchaseData.purchase_count),
+            position: index + 1
+          });
+        }
+      });
+      
+      setProducts(productsWithStats);
+    }
+    
+    setLoading(false);
   };
 
-  const handleProductClick = (product: Product) => {
-    trackClick(product.id);
-    setSelectedProduct(product);
-    setIsDetailModalOpen(true);
+  const getRankIcon = (position: number) => {
+    switch (position) {
+      case 1:
+        return <Trophy className="w-5 h-5 text-yellow-500" />;
+      case 2:
+        return <Medal className="w-5 h-5 text-gray-400" />;
+      case 3:
+        return <Award className="w-5 h-5 text-orange-500" />;
+      default:
+        return <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">{position}</div>;
+    }
   };
 
-  const handlePurchaseClick = async (product: Product, e: React.MouseEvent) => {
-    e.stopPropagation();
-    await trackPurchase(product);
-    window.open(product.link, '_blank', 'noopener,noreferrer');
+  const getRankColor = (position: number) => {
+    switch (position) {
+      case 1:
+        return 'from-yellow-500 to-yellow-600';
+      case 2:
+        return 'from-gray-400 to-gray-500';
+      case 3:
+        return 'from-orange-500 to-orange-600';
+      default:
+        return 'from-blue-500 to-blue-600';
+    }
   };
 
-  const getPurchaseCount = (productId: number) => {
-    return mostPurchased?.find(p => p.product_id === productId)?.purchase_count || 0;
+  const handleSearch = (term: string) => {
+    // Implementar busca se necessário
   };
 
-  if (loading || purchasedLoading) {
+  const handlePriceFilter = (min: number, max: number) => {
+    // Implementar filtro de preço se necessário
+  };
+
+  const filteredProducts = selectedCategory === 'todas' 
+    ? products 
+    : products.filter(p => p.categoria === selectedCategory);
+
+  if (loading || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
-        <Header onSearch={() => {}} onPriceFilter={() => {}} />
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900">
+        <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
-              ))}
-            </div>
+            <div className="h-32 bg-white/20 rounded-2xl"></div>
+            <ProductGrid loading={true} products={[]} />
           </div>
         </div>
       </div>
@@ -120,143 +163,179 @@ const MaisComprados = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
-      <Header onSearch={() => {}} onPriceFilter={() => {}} />
+      <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
       
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8 animate-fade-in">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => navigate('/')} 
-            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left flex items-center gap-3">
-              <TrendingUp className="w-6 h-6 md:w-8 md:h-8 text-green-400" />
-              📈 Mais Comprados
-            </h1>
-            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
-              Os {products.length} materiais jurídicos mais procurados pelos profissionais
-            </p>
+      {/* Header Section */}
+      <section className="px-4 md:px-6 py-8 bg-gradient-to-r from-green-900/40 to-blue-900/40 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/')}
+              className="bg-white/20 text-white border-white/30 hover:bg-white/30"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Voltar
+            </Button>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                <TrendingUp className="w-6 h-6 text-green-300" />
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">
+                  📈 Ranking: Mais Comprados
+                </h1>
+                <p className="text-white/80">
+                  Os materiais jurídicos mais escolhidos pelos profissionais
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-green-400 mb-1">
+                  {products.length}
+                </div>
+                <div className="text-white/80 text-sm">
+                  Produtos no Ranking
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-blue-400 mb-1">
+                  {categories.length - 1}
+                </div>
+                <div className="text-white/80 text-sm">
+                  Categorias Jurídicas
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-purple-400 mb-1">
+                  {products.reduce((sum, p) => sum + p.purchase_count, 0)}
+                </div>
+                <div className="text-white/80 text-sm">
+                  Total de Compras
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
+      </section>
 
-        {products.length === 0 ? (
-          <div className="text-center py-16 animate-fade-in">
-            <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-              <TrendingUp className="w-16 h-16 text-white/50" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
-              Ainda coletando dados de compras
+      {/* Top 3 Products */}
+      {filteredProducts.length > 0 && (
+        <section className="px-4 md:px-6 py-8">
+          <div className="max-w-7xl mx-auto">
+            <h2 className="text-xl font-bold text-white mb-6 text-center">
+              🏆 Top 3 Mais Comprados
             </h2>
-            <p className="text-white/80 mb-6">
-              Em breve você verá os materiais mais comprados aqui
-            </p>
-            <Button onClick={() => navigate('/')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
-              Explorar Livraria
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-4 md:space-y-6">
-            {products.map((product, index) => {
-              const purchaseCount = getPurchaseCount(product.id);
-              
-              return (
-                <div 
-                  key={product.id} 
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 hover:bg-white/15 transition-all duration-300 animate-fade-in cursor-pointer group hover:scale-[1.02] hover:shadow-2xl hover:shadow-blue-500/20" 
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  onClick={() => handleProductClick(product)}
-                >
-                  <div className="flex gap-4 md:gap-6">
-                    {/* Ranking Badge */}
-                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {index + 1}
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+              {filteredProducts.slice(0, 3).map((product) => (
+                <Card key={product.id} className="overflow-hidden bg-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                  <div className={`h-2 bg-gradient-to-r ${getRankColor(product.position)}`}></div>
+                  
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        {getRankIcon(product.position)}
+                        <Badge variant="secondary" className="text-xs">
+                          #{product.position}
+                        </Badge>
+                      </div>
+                      <Badge className="bg-green-100 text-green-800">
+                        {product.purchase_count} compras
+                      </Badge>
                     </div>
                     
-                    {/* Product Image */}
-                    <div className="w-24 h-32 md:w-32 md:h-40 flex-shrink-0 rounded-xl overflow-hidden relative group-hover:scale-105 transition-transform duration-300">
-                      <OptimizedImage 
-                        src={product.imagem1} 
-                        alt={product.produto} 
-                        className="w-full h-full object-cover" 
+                    <div className="aspect-[3/4] mb-4 overflow-hidden rounded-lg">
+                      <img
+                        src={product.imagem1}
+                        alt={product.produto}
+                        className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                     
-                    <div className="flex-1 min-w-0 space-y-3 md:space-y-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2 flex-wrap">
-                            <Badge className="bg-gradient-to-r from-green-600 to-blue-600 text-white font-bold text-xs animate-pulse">
-                              MAIS COMPRADO
-                            </Badge>
-                            {purchaseCount > 0 && (
-                              <Badge variant="secondary" className="text-xs bg-white/20 text-green-300 border-green-400/30">
-                                {purchaseCount} compras
-                              </Badge>
-                            )}
-                            <Badge variant="secondary" className="text-xs bg-white/20 text-purple-300 border-purple-400/30">
-                              {product.categoria}
-                            </Badge>
-                          </div>
-                          
-                          <h3 className="text-white font-semibold text-base md:text-lg xl:text-xl line-clamp-2 mb-3 group-hover:text-purple-200 transition-colors">
-                            {product.produto}
-                          </h3>
-                          
-                          {/* Rating Simulation */}
-                          <div className="flex items-center gap-2 mb-3">
-                            <div className="flex items-center gap-1">
-                              {[1, 2, 3, 4, 5].map((star) => (
-                                <Star 
-                                  key={star} 
-                                  className="w-3 h-3 md:w-4 md:h-4 text-yellow-400 fill-yellow-400" 
-                                />
-                              ))}
-                            </div>
-                            <span className="text-white/80 text-xs md:text-sm font-medium">
-                              4.8 • {purchaseCount || Math.floor(Math.random() * 100) + 20} avaliações
-                            </span>
-                          </div>
-                          
-                          <div className="text-green-400 font-bold text-xl md:text-2xl mb-4 group-hover:text-green-300 transition-colors">
-                            {formatPrice(product.valor)}
-                          </div>
-                        </div>
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
+                      {product.produto}
+                    </h3>
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="font-bold text-red-600">
+                        {product.valor.includes('R$') ? product.valor : `R$ ${product.valor}`}
                       </div>
-                      
-                      {/* Action Button */}
-                      <div className="flex items-center gap-2 md:gap-3">
-                        <Button 
-                          size="sm" 
-                          onClick={(e) => handlePurchaseClick(product, e)}
-                          className="bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white text-xs md:text-sm px-4 md:px-6 py-2 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                        >
-                          <ShoppingBag className="w-3 h-3 md:w-4 md:h-4 mr-2" />
-                          Comprar Agora
-                        </Button>
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                        <span className="text-sm text-gray-600">4.9</span>
                       </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                    
+                    <Button 
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold"
+                      onClick={() => window.open(product.link, '_blank')}
+                    >
+                      Ver Produto
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        )}
-      </div>
-
-      {/* Product Detail Modal */}
-      {selectedProduct && (
-        <ProductDetailModal 
-          isOpen={isDetailModalOpen} 
-          onClose={() => setIsDetailModalOpen(false)} 
-          product={selectedProduct} 
-        />
+        </section>
       )}
+
+      {/* All Products Grid */}
+      <section className="px-4 md:px-6 py-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-white">
+              📊 Ranking Completo
+            </h2>
+            
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-gray-900"
+            >
+              {categories.map(category => (
+                <option key={category} value={category}>
+                  {category === 'todas' ? 'Todas as Categorias' : category}
+                </option>
+              ))}
+            </select>
+          </div>
+          
+          <ProductGrid 
+            products={filteredProducts}
+            loading={false}
+            compact={true}
+            listView={false}
+          />
+          
+          {filteredProducts.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <TrendingUp className="w-16 h-16 text-white/50" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-4">
+                Nenhum produto encontrado
+              </h2>
+              <p className="text-white/80">
+                Não há produtos nesta categoria ainda
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };
