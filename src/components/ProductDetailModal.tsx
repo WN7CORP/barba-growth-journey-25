@@ -17,10 +17,10 @@ interface Product {
   produto: string;
   valor: string;
   imagem1: string;
-  imagem2: string;
-  imagem3: string;
-  imagem4: string;
-  imagem5: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem4?: string;
+  imagem5?: string;
   link: string;
   categoria: string;
   descricao?: string;
