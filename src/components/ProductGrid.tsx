@@ -6,6 +6,7 @@ interface Product {
   id: number;
   produto: string;
   valor: string;
+  video: string;
   imagem1: string;
   imagem2: string;
   imagem3: string;
@@ -22,29 +23,21 @@ interface ProductGridProps {
   selectable?: boolean;
   selectedProducts?: Product[];
   onProductToggle?: (product: Product) => void;
-  listView?: boolean;
 }
 
 const ProductGridComponent: React.FC<ProductGridProps> = ({ 
   products, 
   loading = false, 
-  compact = false,
+  compact = true,
   selectable = false,
   selectedProducts = [],
-  onProductToggle,
-  listView = false
+  onProductToggle
 }) => {
   if (loading) {
     return (
-      <div className={`grid gap-2 md:gap-3 ${
-        listView 
-          ? 'grid-cols-1 gap-4'
-          : compact 
-            ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6' 
-            : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
-      }`}>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3">
         {Array.from({ length: 12 }).map((_, index) => (
-          <div key={index} className={`${listView ? 'h-32' : 'h-64'} bg-white/20 rounded-2xl animate-pulse`}></div>
+          <div key={index} className="h-64 bg-white/20 rounded-2xl animate-pulse"></div>
         ))}
       </div>
     );
@@ -68,11 +61,9 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   return (
     <div className={`grid gap-3 md:gap-4 ${
-      listView 
-        ? 'grid-cols-1 gap-4'
-        : compact 
-          ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
-          : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+      compact 
+        ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
+        : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
     }`}>
       {products.map((product, index) => (
         <ProductCard
@@ -82,7 +73,6 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
           selectable={selectable}
           selected={selectedProducts.some(p => p.id === product.id)}
           onToggle={onProductToggle}
-          listView={listView}
           style={{ animationDelay: `${index * 0.05}s` }}
         />
       ))}
