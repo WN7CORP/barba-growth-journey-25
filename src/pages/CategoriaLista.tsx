@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { ProductGrid } from '@/components/ProductGrid';
 import { supabase } from "@/integrations/supabase/client";
 import { useMostPurchased } from '@/hooks/useMostPurchased';
+
 interface Product {
   id: number;
   produto: string;
@@ -20,6 +21,7 @@ interface Product {
   descricao?: string;
   link: string;
 }
+
 const CategoriaLista = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -35,9 +37,11 @@ const CategoriaLista = () => {
   const {
     data: mostPurchased
   } = useMostPurchased(100);
+
   useEffect(() => {
     fetchProducts();
   }, [categoria, tipo]);
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -87,11 +91,13 @@ const CategoriaLista = () => {
       setLoading(false);
     }
   };
+
   const parsePrice = (priceString: string): number => {
     if (!priceString) return 0;
     const cleanPrice = priceString.replace(/[^\d,]/g, '').replace(',', '.');
     return parseFloat(cleanPrice) || 0;
   };
+
   const sortProducts = () => {
     const sorted = [...products].sort((a, b) => {
       if (sortBy === 'nome') {
@@ -106,11 +112,13 @@ const CategoriaLista = () => {
     });
     setProducts(sorted);
   };
+
   useEffect(() => {
     if (products.length > 0) {
       sortProducts();
     }
   }, [sortBy, sortOrder]);
+
   const getPageTitle = () => {
     if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
       return '📈 Materiais Mais Comprados';
@@ -120,6 +128,7 @@ const CategoriaLista = () => {
     }
     return '📚 Todos os Materiais Jurídicos';
   };
+
   const getPageDescription = () => {
     if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
       return `Os ${products.length} materiais mais procurados pelos profissionais`;
@@ -129,10 +138,11 @@ const CategoriaLista = () => {
     }
     return `${products.length} materiais jurídicos disponíveis`;
   };
+
   if (loading) {
     return <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 safe-bottom">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
-        <div className="page-container py-6 sm:py-8">
+        <div className="py-6 sm:py-8 px-3 sm:px-6">
           <div className="animate-pulse space-y-6">
             <div className="h-24 sm:h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
@@ -140,13 +150,19 @@ const CategoriaLista = () => {
         </div>
       </div>;
   }
+
   return <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 safe-bottom">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
-      <div className="page-container sm:py-8 py-[23px] px-[12px]">
+      <div className="py-6 sm:py-8 px-3 sm:px-6">
         {/* Header */}
         <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-in">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/categorias')} className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105 touch-target">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => navigate('/categorias')} 
+            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105 touch-target"
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
             <span className="hidden sm:inline">Voltar</span>
           </Button>
@@ -161,13 +177,31 @@ const CategoriaLista = () => {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 animate-fade-in mobile-padding">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 animate-fade-in">
           <div className="flex items-center gap-2">
-            <Button size="sm" variant={viewMode === 'grid' ? 'default' : 'outline'} onClick={() => setViewMode('grid')} className={`touch-target ${viewMode === 'grid' ? 'bg-white text-blue-900' : 'bg-white/20 text-white border-white/30 hover:bg-white/30'}`}>
+            <Button 
+              size="sm" 
+              variant={viewMode === 'grid' ? 'default' : 'outline'} 
+              onClick={() => setViewMode('grid')} 
+              className={`touch-target ${
+                viewMode === 'grid' 
+                  ? 'bg-white text-blue-900' 
+                  : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+              }`}
+            >
               <Grid className="w-4 h-4" />
               <span className="hidden sm:inline ml-2">Grid</span>
             </Button>
-            <Button size="sm" variant={viewMode === 'list' ? 'default' : 'outline'} onClick={() => setViewMode('list')} className={`touch-target ${viewMode === 'list' ? 'bg-white text-blue-900' : 'bg-white/20 text-white border-white/30 hover:bg-white/30'}`}>
+            <Button 
+              size="sm" 
+              variant={viewMode === 'list' ? 'default' : 'outline'} 
+              onClick={() => setViewMode('list')} 
+              className={`touch-target ${
+                viewMode === 'list' 
+                  ? 'bg-white text-blue-900' 
+                  : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+              }`}
+            >
               <List className="w-4 h-4" />
               <span className="hidden sm:inline ml-2">Lista</span>
             </Button>
@@ -193,16 +227,26 @@ const CategoriaLista = () => {
                 </SelectItem>
               </SelectContent>
             </Select>
-            <Button size="sm" variant="outline" onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target px-3">
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')} 
+              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target px-3"
+            >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </Button>
           </div>
         </div>
 
         {/* Products Grid/List */}
-        <ProductGrid products={products} compact={viewMode === 'grid'} listView={viewMode === 'list'} />
+        <ProductGrid 
+          products={products} 
+          compact={viewMode === 'grid'} 
+          listView={viewMode === 'list'} 
+        />
 
-        {products.length === 0 && <div className="text-center py-16 animate-fade-in page-container">
+        {products.length === 0 && (
+          <div className="text-center py-16 animate-fade-in px-4">
             <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
               <div className="text-4xl sm:text-6xl">📦</div>
             </div>
@@ -212,11 +256,16 @@ const CategoriaLista = () => {
             <p className="text-white/80 mb-6 mobile-text-large">
               Não há produtos disponíveis nesta categoria no momento
             </p>
-            <Button onClick={() => navigate('/categorias')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 btn-responsive-large">
+            <Button 
+              onClick={() => navigate('/categorias')} 
+              className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 btn-responsive-large"
+            >
               Explorar Outras Categorias
             </Button>
-          </div>}
+          </div>
+        )}
       </div>
     </div>;
 };
+
 export default CategoriaLista;
