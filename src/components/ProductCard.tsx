@@ -142,7 +142,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               className="btn-ver-detalhes"
             >
               <Eye className="w-4 h-4 mr-2" />
-              <span className="font-semibold">Ver Detalhes</span>
+              <span className="font-semibold">Ver Mais</span>
             </Button>
             <Button 
               onClick={handleBuyClick} 
@@ -247,7 +247,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               onClick={handleVerMaisClick}
             >
               <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
-              <span className="truncate">Ver detalhes</span>
+              <span className="truncate">Ver mais</span>
             </Button>
           </div>
         </CardContent>
