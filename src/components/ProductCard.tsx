@@ -221,41 +221,36 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        {/* Conteúdo - Redesenhado para melhor proporção */}
-        <CardContent className="p-4 flex flex-col justify-between flex-1">
-          <div className="flex-1 min-w-0 mb-3">
-            <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 hover:text-purple-700 transition-colors leading-tight text-sm leading-relaxed min-h-[2.5rem]">
+        {/* Conteúdo - Altura Flexível com Altura Mínima */}
+        <CardContent className="p-3 flex flex-col justify-between flex-1 min-h-[128px] py-0 px-[10px] my-0 mx-0">
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight mobile-text min-h-[2.5rem] prevent-overflow">
               {product.produto}
             </h3>
-          </div>
-          
-          {/* Área de Preço e Avaliação - Melhorada */}
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-3 mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="font-bold text-green-600 text-lg">
+            
+            <div className="flex items-center justify-between mb-3">
+              <div className="font-bold text-green-600 text-lg sm:text-xl prevent-overflow">
                 {formatPrice(product.valor)}
               </div>
-              <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <Star className="w-4 h-4 text-amber-500 fill-current" />
-                <span className="text-sm text-amber-700 font-semibold">4.8</span>
+                <span className="text-sm text-gray-600 font-medium">4.8</span>
               </div>
-            </div>
-            
-            {/* Badge de Oferta Limitada */}
-            <div className="bg-red-100 text-red-700 text-xs font-semibold px-2 py-1 rounded-md text-center">
-              ⚡ OFERTA LIMITADA
             </div>
           </div>
           
-          {/* Botão Ver Detalhes - Redesenhado */}
-          <Button 
-            size="sm" 
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 py-2.5 rounded-xl" 
-            onClick={handleVerMaisClick}
-          >
-            <BookOpen className="w-4 h-4 mr-2" />
-            Ver detalhes
-          </Button>
+          {/* Botões - Área Fixa no Final */}
+          <div className="space-y-2 mt-auto">            
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive" 
+              onClick={handleVerMaisClick}
+            >
+              <BookOpen className="w-4 h-4 mr-2" />
+              Ver detalhes
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
