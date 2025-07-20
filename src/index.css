@@ -299,13 +299,13 @@
     @apply px-4 py-3 text-base sm:px-6 sm:py-3.5 sm:text-lg min-h-[48px] touch-target-large;
   }
   
-  /* Safe areas for mobile */
+  /* Safe areas for mobile - Fixed version */
   .safe-top {
-    @apply pt-safe-top;
+    @apply pt-2 sm:pt-4;
   }
   
   .safe-bottom {
-    @apply pb-safe-bottom mb-16 sm:mb-0;
+    @apply pb-4 mb-16 sm:mb-0 sm:pb-6;
   }
   
   /* List layout improvements */
