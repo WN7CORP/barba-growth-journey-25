@@ -37,13 +37,13 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   if (loading) {
     return (
       <div className={listView 
-        ? "space-y-3" 
-        : "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2 md:gap-3"
+        ? "space-y-2" 
+        : "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2 sm:gap-3 md:gap-4"
       }>
         {Array.from({ length: listView ? 8 : 12 }).map((_, index) => (
           <div key={index} className={listView 
-            ? "h-24 bg-white/20 rounded-lg animate-pulse" 
-            : "h-64 bg-white/20 rounded-2xl animate-pulse"
+            ? "h-[100px] bg-white/20 rounded-lg animate-pulse" 
+            : `${compact ? 'h-[280px]' : 'h-[320px]'} bg-white/20 rounded-2xl animate-pulse`
           }></div>
         ))}
       </div>
@@ -52,7 +52,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 animate-fade-in">
+      <div className="text-center py-16 animate-fade-in px-4">
         <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
           <div className="w-16 h-16 text-white/50">📦</div>
         </div>
@@ -68,7 +68,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (listView) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-2 px-1">
         {products.map((product, index) => (
           <div
             key={product.id}
@@ -90,7 +90,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   }
 
   return (
-    <div className={`grid gap-3 md:gap-4 ${
+    <div className={`grid gap-2 sm:gap-3 md:gap-4 ${
       compact 
         ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6' 
         : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
