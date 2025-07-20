@@ -99,7 +99,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-4 p-3 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 min-h-[120px]" onClick={handleCardClick}>
+        <div className="flex gap-3 p-3 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 min-h-[120px]" onClick={handleCardClick}>
           {/* Capa Maior */}
           <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
             <LazyImage 
@@ -112,7 +112,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           {/* Informações do Produto - Layout Flexível */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base mb-2 leading-tight">
+              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base mb-2 leading-tight min-h-[2.5rem]">
                 {product.produto}
               </h3>
               <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -173,17 +173,19 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         style={style}
         className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
-          bg-white/95 backdrop-blur-sm border-0 shadow-xl group animate-fade-in cursor-pointer h-80 flex flex-col
+          bg-white/95 backdrop-blur-sm border-0 shadow-xl group animate-fade-in cursor-pointer 
+          h-80 flex flex-col
           ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
         `}
         onClick={handleCardClick}
       >
-        <div className="relative flex-1">
+        {/* Área da Imagem - Altura Fixa */}
+        <div className="relative h-48 flex-shrink-0">
           <Carousel className="w-full h-full">
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+                  <div className="h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
                     <LazyImage 
                       src={image} 
                       alt={`${product.produto} - ${index + 1}`}
@@ -193,12 +195,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className={`carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
-            <CarouselNext className={`carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg ${compact ? 'w-5 h-5' : 'w-6 h-6'}`} />
+            <CarouselPrevious className="carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg w-6 h-6" />
+            <CarouselNext className="carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg w-6 h-6" />
           </Carousel>
           
           {showBadge && (
-            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+            <div className="absolute top-2 left-2">
               <Badge className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-xs animate-bounce shadow-lg">
                 {badgeText}
               </Badge>
@@ -226,22 +228,21 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
 
           {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
           {!showBadge && !selectable && (
-            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+            <div className="absolute top-2 left-2">
               <FavoriteButton productId={product.id} showText={false} />
             </div>
           )}
         </div>
 
-        <CardContent className="p-3 flex flex-col justify-between flex-shrink-0">
-          <div>
-            <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
-              compact ? 'text-sm' : 'text-sm sm:text-base'
-            }`}>
+        {/* Conteúdo - Altura Flexível com Altura Mínima */}
+        <CardContent className="p-3 flex flex-col justify-between flex-1 min-h-[128px]">
+          <div className="flex-1">
+            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight text-sm sm:text-base min-h-[2.5rem]">
               {product.produto}
             </h3>
             
             <div className="flex items-center justify-between mb-3">
-              <div className={`font-bold text-green-600 ${compact ? 'text-base' : 'text-lg sm:text-xl'}`}>
+              <div className="font-bold text-green-600 text-lg sm:text-xl">
                 {formatPrice(product.valor)}
               </div>
               <div className="flex items-center gap-1">
@@ -251,7 +252,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
           </div>
           
-          <div className="space-y-2">
+          {/* Botões - Área Fixa no Final */}
+          <div className="space-y-2 mt-auto">
             {/* Sempre mostrar botão de favoritar no conteúdo do card se houver badge ou seleção */}
             {(showBadge || selectable) && (
               <div className="flex gap-1 mb-2">
@@ -262,9 +264,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <Button 
               size="sm" 
               variant="outline"
-              className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 touch-target ${
-                compact ? 'py-2 text-xs' : 'py-2.5 text-sm'
-              }`}
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 touch-target py-2.5 text-sm"
               onClick={handleVerMaisClick}
             >
               <BookOpen className="w-4 h-4 mr-2" />
