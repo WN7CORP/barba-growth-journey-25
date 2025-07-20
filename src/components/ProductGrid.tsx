@@ -1,7 +1,5 @@
-
 import React, { memo } from 'react';
 import { ProductCard } from '@/components/ProductCard';
-
 interface Product {
   id: number;
   produto: string;
@@ -14,7 +12,6 @@ interface Product {
   link: string;
   categoria: string;
 }
-
 interface ProductGridProps {
   products: Product[];
   loading?: boolean;
@@ -24,7 +21,6 @@ interface ProductGridProps {
   selectedProducts?: Product[];
   onProductToggle?: (product: Product) => void;
 }
-
 const ProductGridComponent: React.FC<ProductGridProps> = ({
   products,
   loading = false,
@@ -35,24 +31,14 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   onProductToggle
 }) => {
   if (loading) {
-    return (
-      <div className={listView ? "space-y-3 container-responsive" : "grid-responsive-cards container-responsive"}>
-        {Array.from({ length: listView ? 8 : 12 }).map((_, index) => (
-          <div 
-            key={index} 
-            className={listView 
-              ? "h-24 sm:h-28 bg-white/20 rounded-xl animate-pulse" 
-              : "h-80 bg-white/20 rounded-2xl animate-pulse"
-            }
-          />
-        ))}
-      </div>
-    );
+    return <div className={listView ? "space-y-3 container-responsive" : "grid-responsive-cards container-responsive"}>
+        {Array.from({
+        length: listView ? 8 : 12
+      }).map((_, index) => <div key={index} className={listView ? "h-24 sm:h-28 bg-white/20 rounded-xl animate-pulse" : "h-80 bg-white/20 rounded-2xl animate-pulse"} />)}
+      </div>;
   }
-
   if (products.length === 0) {
-    return (
-      <div className="text-center py-16 animate-fade-in container-responsive">
+    return <div className="text-center py-16 animate-fade-in container-responsive">
         <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
           <div className="text-4xl sm:text-6xl">📦</div>
         </div>
@@ -62,49 +48,22 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
         <p className="text-white/80 mobile-text-large">
           Não há produtos disponíveis no momento
         </p>
-      </div>
-    );
+      </div>;
   }
-
   if (listView) {
-    return (
-      <div className="space-y-3 container-responsive">
-        {products.map((product, index) => (
-          <div 
-            key={product.id} 
-            className="animate-fade-in" 
-            style={{ animationDelay: `${index * 0.05}s` }}
-          >
-            <ProductCard 
-              product={product} 
-              compact={false} 
-              listLayout={true} 
-              selectable={selectable} 
-              selected={selectedProducts.some(p => p.id === product.id)} 
-              onToggle={onProductToggle} 
-            />
-          </div>
-        ))}
-      </div>
-    );
+    return <div className="space-y-3 container-responsive mx-0 px-0 py-0">
+        {products.map((product, index) => <div key={product.id} className="animate-fade-in" style={{
+        animationDelay: `${index * 0.05}s`
+      }}>
+            <ProductCard product={product} compact={false} listLayout={true} selectable={selectable} selected={selectedProducts.some(p => p.id === product.id)} onToggle={onProductToggle} />
+          </div>)}
+      </div>;
   }
-
-  return (
-    <div className="grid-responsive-cards container-responsive">
-      {products.map((product, index) => (
-        <ProductCard 
-          key={product.id} 
-          product={product} 
-          compact={compact} 
-          selectable={selectable} 
-          selected={selectedProducts.some(p => p.id === product.id)} 
-          onToggle={onProductToggle} 
-          style={{ animationDelay: `${index * 0.05}s` }} 
-        />
-      ))}
-    </div>
-  );
+  return <div className="grid-responsive-cards container-responsive">
+      {products.map((product, index) => <ProductCard key={product.id} product={product} compact={compact} selectable={selectable} selected={selectedProducts.some(p => p.id === product.id)} onToggle={onProductToggle} style={{
+      animationDelay: `${index * 0.05}s`
+    }} />)}
+    </div>;
 };
-
 export const ProductGrid = memo(ProductGridComponent);
 ProductGrid.displayName = 'ProductGrid';
