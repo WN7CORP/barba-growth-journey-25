@@ -1,4 +1,3 @@
-
 import React, { useState, memo, useCallback } from 'react';
 import { Star, Scale, BookOpen, GraduationCap, ShoppingBag, Eye } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ProductDetailModal } from '@/components/ProductDetailModal';
 import { LazyImage } from '@/components/LazyImage';
-
 interface Product {
   id: number;
   produto: string;
@@ -21,7 +19,6 @@ interface Product {
   categoria: string;
   descricao?: string;
 }
-
 interface ProductCardProps {
   product: Product;
   showBadge?: boolean;
@@ -33,7 +30,6 @@ interface ProductCardProps {
   style?: React.CSSProperties;
   listLayout?: boolean;
 }
-
 const ProductCardComponent: React.FC<ProductCardProps> = ({
   product,
   showBadge = false,
@@ -46,11 +42,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   listLayout = false
 }) => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
   const getProductImages = useCallback((product: Product) => {
     return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
   }, []);
-
   const formatPrice = useCallback((price: string) => {
     if (!price) return 'Consulte o preço';
     if (price.includes('R$')) {
@@ -58,7 +52,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     }
     return `R$ ${price}`;
   }, []);
-
   const getCategoryIcon = useCallback((category: string) => {
     if (!category) return Scale;
     if (category.includes('Livros') || category.includes('Códigos') || category.includes('Vade')) {
@@ -69,7 +62,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
     }
     return Scale;
   }, []);
-
   const handleCardClick = useCallback((e: React.MouseEvent) => {
     // Evitar abrir o modal se clicar em botões específicos
     if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[role="button"]') || (e.target as HTMLElement).closest('.carousel-nav')) {
@@ -81,31 +73,22 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
       setIsDetailModalOpen(true);
     }
   }, [selectable, onToggle, product]);
-
   const handleBuyClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     window.open(product.link, '_blank');
   }, [product.link]);
-
   const handleVerMaisClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDetailModalOpen(true);
   }, []);
-
   const images = getProductImages(product);
   const CategoryIcon = getCategoryIcon(product.categoria);
-
   if (listLayout) {
-    return (
-      <>
+    return <>
         <div className="list-item-professional">
           {/* Imagem do Produto - Otimizada */}
           <div className="product-image-container">
-            <LazyImage 
-              src={product.imagem1} 
-              alt={product.produto} 
-              className="w-full h-full object-contain rounded-lg" 
-            />
+            <LazyImage src={product.imagem1} alt={product.produto} className="w-full h-full object-contain rounded-lg" />
           </div>
           
           {/* Conteúdo Principal - Layout Profissional */}
@@ -137,88 +120,56 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           
           {/* Área dos Botões - Redesenhada */}
           <div className="product-buttons-area">
-            <Button 
-              onClick={handleVerMaisClick} 
-              className="btn-ver-detalhes"
-            >
+            <Button onClick={handleVerMaisClick} className="btn-ver-detalhes">
               <Eye className="w-4 h-4 mr-2" />
               <span className="font-semibold">Ver Mais</span>
             </Button>
-            <Button 
-              onClick={handleBuyClick} 
-              className="btn-comprar"
-            >
+            <Button onClick={handleBuyClick} className="btn-comprar">
               <ShoppingBag className="w-4 h-4 mr-2" />
               <span className="font-bold">Comprar</span>
             </Button>
           </div>
         </div>
-        <ProductDetailModal 
-          isOpen={isDetailModalOpen} 
-          onClose={() => setIsDetailModalOpen(false)} 
-          product={product} 
-        />
-      </>
-    );
+        <ProductDetailModal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} product={product} />
+      </>;
   }
-
-  return (
-    <>
-      <Card 
-        id={`product-${product.id}`} 
-        style={style} 
-        className={`
+  return <>
+      <Card id={`product-${product.id}`} style={style} className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
           bg-white/95 backdrop-blur-sm border-0 shadow-xl group animate-fade-in cursor-pointer 
           h-[22rem] flex flex-col
           ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
-        `} 
-        onClick={handleCardClick}
-      >
+        `} onClick={handleCardClick}>
         {/* Área da Imagem - Altura Fixa */}
         <div className="relative h-48 flex-shrink-0">
           <Carousel className="w-full h-full">
             <CarouselContent>
-              {images.map((image, index) => (
-                <CarouselItem key={index}>
+              {images.map((image, index) => <CarouselItem key={index}>
                   <div className="h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-2">
-                    <LazyImage 
-                      src={image} 
-                      alt={`${product.produto} - ${index + 1}`} 
-                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" 
-                    />
+                    <LazyImage src={image} alt={`${product.produto} - ${index + 1}`} className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110" />
                   </div>
-                </CarouselItem>
-              ))}
+                </CarouselItem>)}
             </CarouselContent>
             <CarouselPrevious className="carousel-nav left-1 bg-white/95 hover:bg-white shadow-lg w-6 h-6" />
             <CarouselNext className="carousel-nav right-1 bg-white/95 hover:bg-white shadow-lg w-6 h-6" />
           </Carousel>
           
-          {showBadge && (
-            <div className="absolute top-2 left-2">
-              <Badge className="bg-gradient-to-r from-purple-600 to-purple-700 text-white font-bold text-xs animate-bounce shadow-lg">
-                {badgeText}
-              </Badge>
-            </div>
-          )}
+          {showBadge && <div className="absolute top-2 left-2">
+              
+            </div>}
 
-          {product.categoria && !showBadge && compact && (
-            <div className="absolute bottom-1 left-1">
+          {product.categoria && !showBadge && compact && <div className="absolute bottom-1 left-1">
               <Badge variant="secondary" className="text-xs bg-white/95 px-1.5 py-0.5 flex items-center gap-1 shadow-md">
                 <CategoryIcon className="w-3 h-3" />
                 <span className="truncate max-w-16">{product.categoria.split(' ')[0]}</span>
               </Badge>
-            </div>
-          )}
+            </div>}
 
-          {selectable && (
-            <div className="absolute top-2 left-2">
+          {selectable && <div className="absolute top-2 left-2">
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all shadow-lg ${selected ? 'bg-purple-600 border-purple-600' : 'bg-white border-gray-300'}`}>
                 {selected && <div className="w-2 h-2 bg-white rounded-full"></div>}
               </div>
-            </div>
-          )}
+            </div>}
         </div>
 
         {/* Conteúdo - Altura Flexível com Altura Mínima */}
@@ -241,11 +192,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           
           {/* Botões - Área Fixa no Final */}
           <div className="mt-auto mb-2">            
-            <Button 
-              size="sm" 
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive min-h-[40px]" 
-              onClick={handleVerMaisClick}
-            >
+            <Button size="sm" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive min-h-[40px]" onClick={handleVerMaisClick}>
               <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
               <span className="truncate">Ver mais</span>
             </Button>
@@ -253,14 +200,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         </CardContent>
       </Card>
 
-      <ProductDetailModal 
-        isOpen={isDetailModalOpen} 
-        onClose={() => setIsDetailModalOpen(false)} 
-        product={product} 
-      />
-    </>
-  );
+      <ProductDetailModal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} product={product} />
+    </>;
 };
-
 export const ProductCard = memo(ProductCardComponent);
 ProductCard.displayName = 'ProductCard';
