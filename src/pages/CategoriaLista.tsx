@@ -33,7 +33,7 @@ const CategoriaLista = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'nome' | 'preco'>('nome');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  // Padrão para lista compacta quando vem de categorias
+  // Default para lista compacta quando vem de categorias
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(viewParam === 'grid' ? 'grid' : 'list');
   
   const { data: mostPurchased } = useMostPurchased(100);
@@ -46,6 +46,7 @@ const CategoriaLista = () => {
     setLoading(true);
     try {
       if (tipo === 'mais-vendidos' || tipo === 'mais-comprados') {
+        // Get most purchased products
         if (mostPurchased && mostPurchased.length > 0) {
           const productIds = mostPurchased.map(p => p.product_id);
           
@@ -56,6 +57,7 @@ const CategoriaLista = () => {
 
           if (error) throw error;
           
+          // Sort by purchase count
           const sortedProducts = (data || []).sort((a: Product, b: Product) => {
             const aPurchases = mostPurchased.find(p => p.product_id === a.id)?.purchase_count || 0;
             const bPurchases = mostPurchased.find(p => p.product_id === b.id)?.purchase_count || 0;
@@ -73,6 +75,7 @@ const CategoriaLista = () => {
           setProducts(data || []);
         }
       } else {
+        // Regular category filtering - sempre usar MUNDODODIREITO
         let query = supabase.from('MUNDODODIREITO').select('*');
         
         if (categoria && categoria !== 'todas') {
@@ -150,7 +153,7 @@ const CategoriaLista = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
-        <div className="container-responsive py-8">
+        <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
@@ -164,7 +167,7 @@ const CategoriaLista = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
-      <div className="container-responsive py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8 animate-fade-in">
           <Button 
@@ -177,7 +180,7 @@ const CategoriaLista = () => {
             Voltar
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
+            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
               {getPageTitle()}
             </h1>
             <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
@@ -215,7 +218,7 @@ const CategoriaLista = () => {
           
           <div className="flex gap-2">
             <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-              <SelectTrigger className="bg-white text-gray-900 border-0 w-28 sm:w-32">
+              <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white border-gray-300 z-50">
