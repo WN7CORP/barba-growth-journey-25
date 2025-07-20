@@ -170,7 +170,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
           bg-white/95 backdrop-blur-sm border-0 shadow-xl group animate-fade-in cursor-pointer 
-          h-80 flex flex-col
+          h-[22rem] flex flex-col
           ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
         `} 
         onClick={handleCardClick}
@@ -222,13 +222,13 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         </div>
 
         {/* Conteúdo - Altura Flexível com Altura Mínima */}
-        <CardContent className="p-3 flex flex-col justify-between flex-1 min-h-[128px] py-0 px-[10px] my-0 mx-0">
+        <CardContent className="p-4 flex flex-col justify-between flex-1 min-h-[160px]">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight mobile-text min-h-[2.5rem] prevent-overflow">
+            <h3 className="font-semibold text-gray-900 mb-3 line-clamp-2 hover:text-purple-700 transition-colors leading-tight mobile-text min-h-[2.5rem] prevent-overflow">
               {product.produto}
             </h3>
             
-            <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center justify-between mb-4">
               <div className="font-bold text-green-600 text-lg sm:text-xl prevent-overflow">
                 {formatPrice(product.valor)}
               </div>
@@ -240,15 +240,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           </div>
           
           {/* Botões - Área Fixa no Final */}
-          <div className="space-y-2 mt-auto">            
+          <div className="mt-auto mb-2">            
             <Button 
               size="sm" 
-              variant="outline" 
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive" 
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive min-h-[40px]" 
               onClick={handleVerMaisClick}
             >
-              <BookOpen className="w-4 h-4 mr-2" />
-              Ver detalhes
+              <BookOpen className="w-4 h-4 mr-2 flex-shrink-0" />
+              <span className="truncate">Ver detalhes</span>
             </Button>
           </div>
         </CardContent>
