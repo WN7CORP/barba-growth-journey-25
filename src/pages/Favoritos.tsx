@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import { ProductVideoModal } from '@/components/ProductVideoModal';
 import { ProductPhotosModal } from '@/components/ProductPhotosModal';
 import { ProductDetailModal } from '@/components/ProductDetailModal';
+import { ShareButton } from '@/components/ShareButton';
 import { useFavorites } from '@/hooks/useFavorites';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
@@ -41,6 +42,8 @@ const Favoritos = () => {
   }, [favorites]);
 
   const fetchFavoriteProducts = async () => {
+    console.log('Buscando produtos favoritos para IDs:', favorites);
+    
     if (favorites.length === 0) {
       setProducts([]);
       setLoading(false);
@@ -48,13 +51,51 @@ const Favoritos = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      // Primeiro tenta buscar na tabela SHOPEE
+      let { data: shopeeData, error: shopeeError } = await supabase
         .from('SHOPEE')
         .select('*')
         .in('id', favorites);
 
-      if (error) throw error;
-      setProducts(data || []);
+      console.log('Dados encontrados na SHOPEE:', shopeeData);
+      console.log('Erro na SHOPEE:', shopeeError);
+
+      let allProducts = shopeeData || [];
+
+      // Se não encontrou todos os produtos na SHOPEE, tenta na HARRY POTTER
+      if (allProducts.length < favorites.length) {
+        const { data: harryData, error: harryError } = await supabase
+          .from('HARRY POTTER')
+          .select('*')
+          .in('id', favorites);
+
+        console.log('Dados encontrados na HARRY POTTER:', harryData);
+        console.log('Erro na HARRY POTTER:', harryError);
+
+        if (harryData) {
+          allProducts = [...allProducts, ...harryData];
+        }
+      }
+
+      // Se ainda não encontrou todos, tenta na MUNDODODIREITO
+      if (allProducts.length < favorites.length) {
+        const { data: mundoData, error: mundoError } = await supabase
+          .from('MUNDODODIREITO')
+          .select('*')
+          .in('id', favorites);
+
+        console.log('Dados encontrados na MUNDODODIREITO:', mundoData);
+        console.log('Erro na MUNDODODIREITO:', mundoError);
+
+        if (mundoData) {
+          allProducts = [...allProducts, ...mundoData];
+        }
+      }
+
+      console.log('Total de produtos encontrados:', allProducts.length);
+      console.log('Produtos finais:', allProducts);
+
+      setProducts(allProducts);
     } catch (error) {
       console.error('Erro ao buscar produtos favoritos:', error);
     } finally {
@@ -237,13 +278,20 @@ const Favoritos = () => {
                     </div>
                     
                     <div className="space-y-2">
-                      <ProductPhotosModal 
-                        images={getProductImages(product)} 
-                        productName={product.produto}
-                        productPrice={formatPrice(product.valor)}
-                        productLink={product.link}
-                        videoUrl={product.video}
-                      />
+                      <div className="flex gap-1">
+                        <ProductPhotosModal 
+                          images={getProductImages(product)} 
+                          productName={product.produto}
+                          productPrice={formatPrice(product.valor)}
+                          productLink={product.link}
+                          videoUrl={product.video}
+                        />
+                        <ShareButton 
+                          productName={product.produto}
+                          productLink={product.link}
+                          className="flex-1"
+                        />
+                      </div>
                       <Button
                         size="sm"
                         className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold text-xs py-1 hover:scale-105 transition-all duration-300"
@@ -334,13 +382,19 @@ const Favoritos = () => {
                         </div>
                         
                         <div className="flex flex-col sm:flex-row gap-2">
-                          <ProductPhotosModal 
-                            images={getProductImages(product)} 
-                            productName={product.produto} 
-                            productPrice={formatPrice(product.valor)} 
-                            productLink={product.link}
-                            videoUrl={product.video}
-                          />
+                          <div className="flex gap-2">
+                            <ProductPhotosModal 
+                              images={getProductImages(product)} 
+                              productName={product.produto} 
+                              productPrice={formatPrice(product.valor)} 
+                              productLink={product.link}
+                              videoUrl={product.video}
+                            />
+                            <ShareButton 
+                              productName={product.produto}
+                              productLink={product.link}
+                            />
+                          </div>
                           <Button 
                             className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold hover:scale-105 transition-all duration-300 sm:w-auto w-full" 
                             onClick={(e) => {

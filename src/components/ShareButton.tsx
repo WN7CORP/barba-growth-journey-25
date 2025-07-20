@@ -46,18 +46,18 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={`bg-white/10 border-white/20 text-white hover:bg-white/20 ${className}`}
+          className={`bg-blue-500 hover:bg-blue-600 border-blue-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 ${className}`}
         >
           <Share2 className="w-4 h-4 mr-2" />
           Compartilhar
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48 bg-white/95 backdrop-blur-sm">
-        <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer">
+      <DropdownMenuContent className="w-48 bg-white border shadow-lg">
+        <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer hover:bg-gray-50">
           <MessageCircle className="w-4 h-4 mr-2 text-green-600" />
           WhatsApp
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer hover:bg-gray-50">
           {copied ? (
             <>
               <Check className="w-4 h-4 mr-2 text-green-600" />
