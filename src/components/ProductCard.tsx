@@ -8,6 +8,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ProductDetailModal } from '@/components/ProductDetailModal';
 import { FavoriteButton } from '@/components/FavoriteButton';
 import { LazyImage } from '@/components/LazyImage';
+import { ShareButton } from '@/components/ShareButton';
 
 interface Product {
   id: number;
@@ -99,24 +100,24 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-3 p-3 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-100 hover:border-purple-200 min-h-[100px]" onClick={handleCardClick}>
-          {/* Capa Melhorada */}
-          <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden shadow-sm">
+        <div className="flex gap-4 p-4 bg-gradient-to-r from-gray-50/90 to-white/95 rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-200/80 hover:border-blue-300/60 min-h-[120px] backdrop-blur-sm" onClick={handleCardClick}>
+          {/* Capa Melhorada - Aspect Square para melhor centralização */}
+          <div className="w-24 h-32 flex-shrink-0 rounded-lg overflow-hidden shadow-md bg-gradient-to-br from-gray-100 to-gray-50 flex items-center justify-center">
             <LazyImage 
               src={product.imagem1} 
               alt={product.produto}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
           
           {/* Informações do Produto */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between">
+          <div className="flex-1 min-w-0 flex flex-col justify-between py-1">
             <div className="flex-1">
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm mb-2 leading-tight min-h-[2.5rem]">
+              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm mb-3 leading-tight min-h-[2.5rem]">
                 {product.produto}
               </h3>
-              <div className="flex items-center gap-2 mb-2">
-                <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+              <div className="flex items-center gap-3 mb-3">
+                <Badge variant="secondary" className="text-xs bg-blue-50/80 text-blue-700 border-blue-200/60 flex items-center gap-1 px-2 py-1">
                   <CategoryIcon className="w-3 h-3" />
                   <span className="truncate max-w-[80px]">{product.categoria}</span>
                 </Badge>
@@ -128,27 +129,32 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
             
             {/* Preço e Ações */}
-            <div className="flex items-center justify-between gap-2 mt-auto">
-              <div className="font-bold text-green-600 text-base">
+            <div className="flex items-center justify-between gap-3 mt-auto">
+              <div className="font-bold text-green-600 text-lg drop-shadow-sm">
                 {formatPrice(product.valor)}
               </div>
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-2">
                 <FavoriteButton 
                   productId={product.id} 
                   size="sm" 
                   showText={false}
                 />
+                <ShareButton 
+                  productName={product.produto} 
+                  productLink={product.link}
+                  className="p-2"
+                />
                 <Button 
                   size="sm" 
                   onClick={handleVerMaisClick} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1 text-xs min-h-[32px]"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 text-xs min-h-[36px] transition-all hover:scale-105"
                 >
                   Ver
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={handleBuyClick}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1 text-xs min-h-[32px]"
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-2 text-xs min-h-[36px] transition-all hover:scale-105"
                 >
                   <ShoppingBag className="w-3 h-3 mr-1" />
                   Comprar
@@ -173,8 +179,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         style={style}
         className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
-          bg-white border-0 shadow-xl group animate-fade-in cursor-pointer
-          ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
+          bg-gradient-to-br from-gray-50/95 to-white border border-gray-200/60 shadow-lg group animate-fade-in cursor-pointer
+          ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100/50'}
           ${compact ? 'min-h-[280px]' : 'min-h-[320px]'}
         `}
         onClick={handleCardClick}
@@ -184,11 +190,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className={`overflow-hidden ${compact ? 'aspect-[3/4] h-40' : 'aspect-[3/4] h-48'}`}>
+                  <div className={`overflow-hidden bg-gradient-to-br from-gray-100/80 to-gray-50 flex items-center justify-center ${compact ? 'aspect-[3/4] h-40' : 'aspect-[3/4] h-48'}`}>
                     <LazyImage 
                       src={image} 
                       alt={`${product.produto} - ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                 </CarouselItem>
@@ -225,9 +231,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
           )}
 
-          {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
+          {/* Favorite button e Share button - sempre presente no canto superior */}
           {!showBadge && !selectable && (
-            <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
+            <div className={`absolute ${compact ? 'top-1 right-1' : 'top-2 right-2'} flex gap-1`}>
+              <ShareButton 
+                productName={product.produto} 
+                productLink={product.link}
+                className="p-1.5"
+              />
               <FavoriteButton productId={product.id} showText={false} />
             </div>
           )}
@@ -242,7 +253,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </h3>
             
             <div className="flex items-center justify-between mb-3">
-              <div className={`font-bold text-green-600 ${compact ? 'text-sm' : 'text-lg'}`}>
+              <div className={`font-bold text-green-600 drop-shadow-sm ${compact ? 'text-base' : 'text-xl'}`}>
                 {formatPrice(product.valor)}
               </div>
               <div className="flex items-center gap-1">
@@ -257,6 +268,10 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             {(showBadge || selectable) && (
               <div className="flex gap-1 mb-2">
                 <FavoriteButton productId={product.id} />
+                <ShareButton 
+                  productName={product.produto} 
+                  productLink={product.link}
+                />
               </div>
             )}
             

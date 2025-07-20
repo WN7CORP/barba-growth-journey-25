@@ -23,7 +23,8 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
   const [copied, setCopied] = useState(false);
 
   const shareText = `Confira este produto: ${productName}`;
-  const currentUrl = window.location.origin + '/produto/' + encodeURIComponent(productName);
+  // Usar a URL atual da página em vez de construir uma nova
+  const currentUrl = window.location.href;
 
   const handleCopyLink = async () => {
     try {
@@ -46,27 +47,27 @@ export const ShareButton: React.FC<ShareButtonProps> = ({
         <Button
           variant="outline"
           size="sm"
-          className={`bg-white/10 border-white/20 text-white hover:bg-white/20 ${className}`}
+          className={`bg-gradient-to-r from-indigo-500/90 to-purple-600/90 border-0 text-white hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all hover:scale-105 backdrop-blur-sm ${className}`}
         >
-          <Share2 className="w-4 h-4 mr-2" />
-          Compartilhar
+          <Share2 className="w-4 h-4 mr-1" />
+          <span className="hidden sm:inline">Compartilhar</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-48 bg-white/95 backdrop-blur-sm">
-        <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer">
+      <DropdownMenuContent className="w-48 bg-gradient-to-br from-white/95 to-gray-50/95 backdrop-blur-md border border-gray-200/60 shadow-xl">
+        <DropdownMenuItem onClick={handleWhatsAppShare} className="cursor-pointer hover:bg-green-50 transition-colors">
           <MessageCircle className="w-4 h-4 mr-2 text-green-600" />
-          WhatsApp
+          <span className="font-medium">WhatsApp</span>
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer">
+        <DropdownMenuItem onClick={handleCopyLink} className="cursor-pointer hover:bg-blue-50 transition-colors">
           {copied ? (
             <>
               <Check className="w-4 h-4 mr-2 text-green-600" />
-              Link copiado!
+              <span className="font-medium text-green-600">Link copiado!</span>
             </>
           ) : (
             <>
-              <Copy className="w-4 h-4 mr-2" />
-              Copiar link
+              <Copy className="w-4 h-4 mr-2 text-blue-600" />
+              <span className="font-medium">Copiar link</span>
             </>
           )}
         </DropdownMenuItem>
