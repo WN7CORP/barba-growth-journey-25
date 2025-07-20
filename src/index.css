@@ -170,88 +170,6 @@
   .btn-comprar {
     @apply bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-2.5 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex-1 sm:flex-none;
   }
-
-  /* Enhanced product card styles */
-  .product-card-enhanced {
-    @apply bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] border border-gray-100 overflow-hidden group;
-  }
-
-  .product-image-enhanced {
-    @apply w-full h-48 sm:h-56 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden group-hover:scale-105 transition-transform duration-500;
-  }
-
-  .product-overlay {
-    @apply absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center;
-  }
-
-  .product-actions-floating {
-    @apply absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0;
-  }
-
-  .floating-action-btn {
-    @apply w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300;
-  }
-
-  .product-content-enhanced {
-    @apply p-4 space-y-3;
-  }
-
-  .product-category-enhanced {
-    @apply text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full inline-block;
-  }
-
-  .product-title-enhanced {
-    @apply font-bold text-gray-900 text-base leading-tight line-clamp-2 hover:text-purple-600 transition-colors cursor-pointer;
-  }
-
-  .product-price-enhanced {
-    @apply text-2xl font-bold text-green-600;
-  }
-
-  .product-buttons-enhanced {
-    @apply space-y-2;
-  }
-
-  .btn-primary-enhanced {
-    @apply w-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02];
-  }
-
-  .btn-secondary-enhanced {
-    @apply w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 hover:scale-[1.02];
-  }
-
-  /* 404 Page Styles */
-  .error-container {
-    @apply min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100 flex items-center justify-center px-4;
-  }
-
-  .error-content {
-    @apply text-center max-w-2xl mx-auto;
-  }
-
-  .error-number {
-    @apply text-8xl sm:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 mb-4;
-  }
-
-  .error-title {
-    @apply text-2xl sm:text-4xl font-bold text-gray-800 mb-6;
-  }
-
-  .error-description {
-    @apply text-lg text-gray-600 mb-8 max-w-lg mx-auto;
-  }
-
-  .error-actions {
-    @apply flex flex-col sm:flex-row gap-4 justify-center items-center;
-  }
-
-  .btn-home {
-    @apply bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105;
-  }
-
-  .btn-back {
-    @apply bg-white hover:bg-gray-50 text-gray-700 font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-200;
-  }
 }
 
 /* Line clamp utilities */
@@ -385,7 +303,7 @@
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   .bg-gradient-to-r {
-    background: solid !important;
+    @apply bg-solid;
   }
 }
 
