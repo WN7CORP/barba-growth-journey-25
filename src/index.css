@@ -204,19 +204,74 @@
     -webkit-line-clamp: 3;
   }
   
-  /* Container responsivo principal */
+  /* SISTEMA DE CONTAINERS MELHORADO */
   .container-responsive {
-    @apply w-full max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8;
+    @apply w-full max-w-7xl mx-auto;
+    padding-left: max(16px, env(safe-area-inset-left));
+    padding-right: max(16px, env(safe-area-inset-right));
   }
   
-  /* Container para páginas internas */
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .container-responsive {
+      padding-left: max(32px, env(safe-area-inset-left));
+      padding-right: max(32px, env(safe-area-inset-right));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: max(40px, env(safe-area-inset-left));
+      padding-right: max(40px, env(safe-area-inset-right));
+    }
+  }
+  
+  /* Container para páginas internas com margens mais generosas */
   .page-container {
-    @apply w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply w-full max-w-6xl mx-auto;
+    padding-left: max(20px, env(safe-area-inset-left));
+    padding-right: max(20px, env(safe-area-inset-right));
   }
   
-  /* Container para listas/grids */
+  @media (min-width: 640px) {
+    .page-container {
+      padding-left: max(32px, env(safe-area-inset-left));
+      padding-right: max(32px, env(safe-area-inset-right));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .page-container {
+      padding-left: max(40px, env(safe-area-inset-left));
+      padding-right: max(40px, env(safe-area-inset-right));
+    }
+  }
+  
+  /* Container para listas/grids com padding interno */
   .content-container {
-    @apply w-full mx-auto px-3 sm:px-4 md:px-6;
+    @apply w-full mx-auto;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+  }
+  
+  @media (min-width: 640px) {
+    .content-container {
+      padding-left: max(20px, env(safe-area-inset-left));
+      padding-right: max(20px, env(safe-area-inset-right));
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .content-container {
+      padding-left: max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
+    }
   }
   
   /* Interactive utilities */
@@ -228,7 +283,7 @@
     @apply focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary;
   }
   
-  /* Mobile-friendly touch targets */
+  /* Mobile-friendly touch targets com tamanhos otimizados */
   .touch-target {
     @apply min-h-[44px] min-w-[44px];
   }
@@ -237,30 +292,88 @@
     @apply min-h-[48px] min-w-[48px];
   }
   
-  /* Responsive padding system */
+  .touch-target-compact {
+    @apply min-h-[40px] min-w-[40px];
+  }
+  
+  /* Sistema de padding responsivo melhorado */
   .mobile-padding {
-    @apply px-3 py-2 sm:px-4 sm:py-3;
+    @apply px-3 py-2;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-padding {
+      @apply px-4 py-3;
+    }
   }
   
   .mobile-padding-large {
-    @apply px-4 py-3 sm:px-6 sm:py-4;
+    @apply px-4 py-3;
   }
   
-  /* Responsive text system */
+  @media (min-width: 640px) {
+    .mobile-padding-large {
+      @apply px-6 py-4;
+    }
+  }
+  
+  /* Sistema de texto responsivo melhorado */
   .mobile-text {
-    @apply text-sm sm:text-base leading-relaxed;
+    @apply text-sm leading-relaxed;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-text {
+      @apply text-base;
+    }
   }
   
   .mobile-text-large {
-    @apply text-base sm:text-lg leading-relaxed;
+    @apply text-base leading-relaxed;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-text-large {
+      @apply text-lg;
+    }
   }
   
   .mobile-heading {
-    @apply text-lg sm:text-xl md:text-2xl font-bold;
+    @apply text-lg font-bold;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-heading {
+      @apply text-xl;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .mobile-heading {
+      @apply text-2xl;
+    }
   }
   
   .mobile-heading-large {
-    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold;
+    @apply text-xl font-bold;
+  }
+  
+  @media (min-width: 640px) {
+    .mobile-heading-large {
+      @apply text-2xl;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .mobile-heading-large {
+      @apply text-3xl;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .mobile-heading-large {
+      @apply text-4xl;
+    }
   }
   
   /* Gradient backgrounds */
@@ -277,40 +390,198 @@
     @apply bg-white shadow-sm border border-gray-200 rounded-lg hover:shadow-md transition-shadow duration-200;
   }
   
-  /* Mobile-first responsive grid system */
+  /* Sistema de grid responsivo melhorado */
   .grid-responsive {
-    @apply grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+    @apply grid gap-2 grid-cols-2;
+  }
+  
+  @media (min-width: 640px) {
+    .grid-responsive {
+      @apply grid-cols-3 gap-3;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .grid-responsive {
+      @apply grid-cols-4 gap-4;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid-responsive {
+      @apply grid-cols-5 gap-4;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid-responsive {
+      @apply grid-cols-6 gap-5;
+    }
   }
   
   .grid-responsive-large {
-    @apply grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+    @apply grid gap-3 grid-cols-1;
+  }
+  
+  @media (min-width: 640px) {
+    .grid-responsive-large {
+      @apply grid-cols-2 gap-4;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid-responsive-large {
+      @apply grid-cols-3 gap-5;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid-responsive-large {
+      @apply grid-cols-4 gap-6;
+    }
   }
   
   .grid-responsive-cards {
-    @apply grid gap-3 sm:gap-4 md:gap-5 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6;
+    @apply grid gap-3 grid-cols-2;
   }
   
-  /* Button responsive system */
+  @media (min-width: 640px) {
+    .grid-responsive-cards {
+      @apply grid-cols-3 gap-4;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .grid-responsive-cards {
+      @apply grid-cols-4 gap-4;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .grid-responsive-cards {
+      @apply grid-cols-5 gap-5;
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .grid-responsive-cards {
+      @apply grid-cols-6 gap-5;
+    }
+  }
+  
+  /* Sistema de botões responsivo melhorado */
   .btn-responsive {
-    @apply px-3 py-2 text-sm sm:px-4 sm:py-2.5 sm:text-base min-h-[44px] touch-target;
+    @apply px-2 py-1.5 text-xs min-h-[40px] touch-target-compact;
+  }
+  
+  @media (min-width: 640px) {
+    .btn-responsive {
+      @apply px-3 py-2 text-sm min-h-[44px] touch-target;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .btn-responsive {
+      @apply px-4 py-2.5 text-base;
+    }
   }
   
   .btn-responsive-large {
-    @apply px-4 py-3 text-base sm:px-6 sm:py-3.5 sm:text-lg min-h-[48px] touch-target-large;
+    @apply px-3 py-2 text-sm min-h-[44px] touch-target;
   }
   
-  /* Safe areas for mobile - Fixed version */
+  @media (min-width: 640px) {
+    .btn-responsive-large {
+      @apply px-4 py-3 text-base min-h-[48px] touch-target-large;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    .btn-responsive-large {
+      @apply px-6 py-3.5 text-lg;
+    }
+  }
+  
+  /* Safe areas melhorado */
   .safe-top {
-    @apply pt-2 sm:pt-4;
+    padding-top: max(8px, env(safe-area-inset-top));
+  }
+  
+  @media (min-width: 640px) {
+    .safe-top {
+      padding-top: max(16px, env(safe-area-inset-top));
+    }
   }
   
   .safe-bottom {
-    @apply pb-4 mb-16 sm:mb-0 sm:pb-6;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+    margin-bottom: 64px; /* Para navegação móvel */
   }
   
-  /* List layout improvements */
+  @media (min-width: 640px) {
+    .safe-bottom {
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+      margin-bottom: 0;
+    }
+  }
+  
+  /* Layout de lista melhorado */
   .list-item-responsive {
-    @apply flex gap-3 p-3 sm:p-4 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 min-h-[120px] sm:min-h-[140px];
+    @apply flex gap-3 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 overflow-hidden;
+    padding: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right)) 12px 12px;
+    min-height: 120px;
+  }
+  
+  @media (min-width: 640px) {
+    .list-item-responsive {
+      gap: 16px;
+      padding: max(16px, env(safe-area-inset-left)) max(16px, env(safe-area-inset-right)) 16px 16px;
+      min-height: 140px;
+    }
+  }
+  
+  /* Utilities para evitar overflow */
+  .prevent-overflow {
+    @apply overflow-hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .flex-no-overflow {
+    @apply flex;
+    min-width: 0;
+  }
+  
+  .text-no-overflow {
+    @apply truncate;
+    max-width: 100%;
+  }
+  
+  /* Botões compactos para mobile */
+  .btn-compact {
+    @apply px-2 py-1 text-xs min-w-0 flex-shrink-0;
+    min-height: 32px;
+  }
+  
+  @media (min-width: 640px) {
+    .btn-compact {
+      @apply px-3 py-1.5 text-sm;
+      min-height: 36px;
+    }
+  }
+  
+  .btn-compact-icon {
+    @apply p-1.5 min-w-0 flex-shrink-0 aspect-square;
+    min-height: 32px;
+    min-width: 32px;
+  }
+  
+  @media (min-width: 640px) {
+    .btn-compact-icon {
+      @apply p-2;
+      min-height: 36px;
+      min-width: 36px;
+    }
   }
 }
 
@@ -398,7 +669,7 @@
   }
   
   .mobile-safe-padding {
-    @apply px-4 py-2;
+    padding: 8px max(16px, env(safe-area-inset-left)) 8px max(16px, env(safe-area-inset-right));
   }
   
   .mobile-large-text {
@@ -425,5 +696,13 @@
   
   .safe-area-inset-bottom {
     padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+  
+  .safe-area-inset-left {
+    padding-left: max(8px, env(safe-area-inset-left));
+  }
+  
+  .safe-area-inset-right {
+    padding-right: max(8px, env(safe-area-inset-right));
   }
 }

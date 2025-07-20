@@ -47,15 +47,16 @@ export const FavoriteButton = ({
         }
         ${isAnimating ? 'animate-bounce' : ''}
         transition-all duration-300 hover:scale-105 shadow-md hover:shadow-lg
-        ${size === 'sm' ? 'min-h-[44px] min-w-[44px]' : 'min-h-[48px] min-w-[48px]'}
+        ${size === 'sm' ? 'touch-target-compact' : 'touch-target'}
+        ${!showText ? 'aspect-square p-0 min-w-0 w-auto h-auto' : ''}
         ${className}
       `}
     >
       <Heart 
-        className={`${size === 'sm' ? 'w-4 h-4' : 'w-5 h-5'} ${favorite ? 'fill-current' : ''} ${showText ? 'mr-2' : ''}`} 
+        className={`${size === 'sm' ? 'w-3 h-3 sm:w-4 sm:h-4' : 'w-5 h-5'} ${favorite ? 'fill-current' : ''} ${showText ? 'mr-2' : ''}`} 
       />
       {showText && (
-        <span className="text-xs font-medium">
+        <span className="text-xs font-medium whitespace-nowrap">
           {favorite ? 'Favoritado' : 'Favoritar'}
         </span>
       )}
