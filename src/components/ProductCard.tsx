@@ -99,9 +99,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-3 p-3 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 min-h-[120px]" onClick={handleCardClick}>
+        <div className="list-item-responsive" onClick={handleCardClick}>
           {/* Capa Maior */}
-          <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+          <div className="w-20 h-24 sm:w-24 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
             <LazyImage 
               src={product.imagem1} 
               alt={product.produto}
@@ -112,7 +112,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           {/* Informações do Produto - Layout Flexível */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base mb-2 leading-tight min-h-[2.5rem]">
+              <h3 className="font-bold text-gray-900 line-clamp-2 mobile-text mb-2 leading-tight min-h-[2.5rem]">
                 {product.produto}
               </h3>
               <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -141,14 +141,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                 <Button 
                   size="sm" 
                   onClick={handleVerMaisClick} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs sm:text-sm touch-target"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold btn-responsive text-xs sm:text-sm"
                 >
                   Ver detalhes
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={handleBuyClick}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 text-xs sm:text-sm touch-target"
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold btn-responsive text-xs sm:text-sm"
                 >
                   <ShoppingBag className="w-4 h-4 mr-1" />
                   <span className="hidden sm:inline">Comprar</span>
@@ -185,7 +185,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+                  <div className="h-48 overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-2">
                     <LazyImage 
                       src={image} 
                       alt={`${product.produto} - ${index + 1}`}
@@ -226,9 +226,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
           )}
 
-          {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
+          {/* Favorite button - sempre presente no canto superior direito se não houver badge ou seleção */}
           {!showBadge && !selectable && (
-            <div className="absolute top-2 left-2">
+            <div className="absolute top-2 right-2">
               <FavoriteButton productId={product.id} showText={false} />
             </div>
           )}
@@ -237,7 +237,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         {/* Conteúdo - Altura Flexível com Altura Mínima */}
         <CardContent className="p-3 flex flex-col justify-between flex-1 min-h-[128px]">
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight text-sm sm:text-base min-h-[2.5rem]">
+            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight mobile-text min-h-[2.5rem]">
               {product.produto}
             </h3>
             
@@ -264,7 +264,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <Button 
               size="sm" 
               variant="outline"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 touch-target py-2.5 text-sm"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 btn-responsive"
               onClick={handleVerMaisClick}
             >
               <BookOpen className="w-4 h-4 mr-2" />

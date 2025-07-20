@@ -37,12 +37,12 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   if (loading) {
     return (
       <div className={listView 
-        ? "space-y-3" 
-        : "grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6"
+        ? "space-y-3 content-container" 
+        : "grid-responsive-cards content-container"
       }>
         {Array.from({ length: listView ? 8 : 12 }).map((_, index) => (
           <div key={index} className={listView 
-            ? "h-32 bg-white/20 rounded-lg animate-pulse" 
+            ? "h-32 sm:h-36 bg-white/20 rounded-xl animate-pulse" 
             : "h-80 bg-white/20 rounded-2xl animate-pulse"
           }></div>
         ))}
@@ -52,14 +52,14 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-16 animate-fade-in">
-        <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-          <div className="w-16 h-16 text-white/50">📦</div>
+      <div className="text-center py-16 animate-fade-in content-container">
+        <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
+          <div className="text-4xl sm:text-6xl">📦</div>
         </div>
-        <h2 className="text-2xl font-bold text-white mb-4">
+        <h2 className="mobile-heading-large text-white mb-4">
           Nenhum produto encontrado
         </h2>
-        <p className="text-white/80">
+        <p className="text-white/80 mobile-text-large">
           Não há produtos disponíveis no momento
         </p>
       </div>
@@ -68,7 +68,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
 
   if (listView) {
     return (
-      <div className="space-y-3 mx-3">
+      <div className="space-y-3 content-container">
         {products.map((product, index) => (
           <div
             key={product.id}
@@ -90,7 +90,7 @@ const ProductGridComponent: React.FC<ProductGridProps> = ({
   }
 
   return (
-    <div className="grid gap-2 sm:gap-3 md:gap-4 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid-responsive-cards content-container">
       {products.map((product, index) => (
         <ProductCard
           key={product.id}

@@ -152,11 +152,11 @@ const CategoriaLista = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 safe-bottom">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
-        <div className="container-responsive py-8">
+        <div className="page-container py-6 sm:py-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
+            <div className="h-24 sm:h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
           </div>
         </div>
@@ -165,12 +165,12 @@ const CategoriaLista = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 safe-bottom">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
-      <div className="container-responsive py-8">
+      <div className="page-container py-6 sm:py-8">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-8 animate-fade-in">
+        <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8 animate-fade-in">
           <Button 
             variant="ghost" 
             size="sm" 
@@ -178,20 +178,20 @@ const CategoriaLista = () => {
             className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105 touch-target"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Voltar
+            <span className="hidden sm:inline">Voltar</span>
           </Button>
-          <div className="flex-1">
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
+          <div className="flex-1 min-w-0">
+            <h1 className="mobile-heading-large text-white animate-slide-in-left">
               {getPageTitle()}
             </h1>
-            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
+            <p className="text-white/80 animate-slide-in-right mobile-text">
               {getPageDescription()}
             </p>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between mb-6 gap-4 animate-fade-in">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 animate-fade-in mobile-padding">
           <div className="flex items-center gap-2">
             <Button
               size="sm"
@@ -203,6 +203,7 @@ const CategoriaLista = () => {
               }`}
             >
               <Grid className="w-4 h-4" />
+              <span className="hidden sm:inline ml-2">Grid</span>
             </Button>
             <Button
               size="sm"
@@ -214,12 +215,13 @@ const CategoriaLista = () => {
               }`}
             >
               <List className="w-4 h-4" />
+              <span className="hidden sm:inline ml-2">Lista</span>
             </Button>
           </div>
           
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-              <SelectTrigger className="bg-white text-gray-900 border-0 w-32 touch-target">
+              <SelectTrigger className="bg-white text-gray-900 border-0 flex-1 sm:w-32 touch-target">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white border-gray-300 z-50">
@@ -241,7 +243,7 @@ const CategoriaLista = () => {
               size="sm"
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target"
+              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target px-3"
             >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </Button>
@@ -256,19 +258,19 @@ const CategoriaLista = () => {
         />
 
         {products.length === 0 && (
-          <div className="text-center py-16 animate-fade-in">
-            <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
-              <div className="w-16 h-16 text-white/50">📦</div>
+          <div className="text-center py-16 animate-fade-in page-container">
+            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
+              <div className="text-4xl sm:text-6xl">📦</div>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
+            <h2 className="mobile-heading-large text-white mb-4">
               Nenhum produto encontrado
             </h2>
-            <p className="text-white/80 mb-6 mobile-text">
+            <p className="text-white/80 mb-6 mobile-text-large">
               Não há produtos disponíveis nesta categoria no momento
             </p>
             <Button 
               onClick={() => navigate('/categorias')} 
-              className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 touch-target"
+              className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 btn-responsive-large"
             >
               Explorar Outras Categorias
             </Button>
