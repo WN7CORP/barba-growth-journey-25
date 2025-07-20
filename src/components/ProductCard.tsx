@@ -99,60 +99,66 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="list-item-responsive" onClick={handleCardClick}>
-          {/* Capa Maior */}
-          <div className="w-20 h-24 sm:w-24 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
-            <LazyImage 
-              src={product.imagem1} 
-              alt={product.produto}
-              className="w-full h-full object-contain"
-            />
-          </div>
-          
-          {/* Informações do Produto - Layout Flexível */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between">
-            <div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 mobile-text mb-2 leading-tight min-h-[2.5rem]">
-                {product.produto}
-              </h3>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
-                  <CategoryIcon className="w-3 h-3" />
-                  <span className="hidden sm:inline">{product.categoria}</span>
-                </Badge>
-                <div className="flex items-center gap-1">
-                  <Star className="w-3 h-3 text-amber-500 fill-current" />
-                  <span className="text-xs text-gray-600 font-medium">4.8</span>
-                </div>
-              </div>
+        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-4 cursor-pointer" onClick={handleCardClick}>
+          <div className="flex gap-4">
+            {/* Imagem do Produto - Tamanho Fixo */}
+            <div className="w-20 h-24 sm:w-24 sm:h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+              <LazyImage 
+                src={product.imagem1} 
+                alt={product.produto}
+                className="w-full h-full object-contain"
+              />
             </div>
             
-            {/* Preço e Ações - Responsivo */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-              <div className="font-bold text-green-600 text-lg sm:text-xl">
-                {formatPrice(product.valor)}
+            {/* Conteúdo Principal */}
+            <div className="flex-1 min-w-0 flex flex-col justify-between">
+              {/* Título e Categoria */}
+              <div className="mb-3">
+                <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base leading-tight mb-2">
+                  {product.produto}
+                </h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
+                    <CategoryIcon className="w-3 h-3" />
+                    <span className="hidden sm:inline truncate">{product.categoria}</span>
+                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Star className="w-3 h-3 text-amber-500 fill-current" />
+                    <span className="text-xs text-gray-600 font-medium">4.8</span>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <FavoriteButton 
-                  productId={product.id} 
-                  size="sm" 
-                  showText={false}
-                />
-                <Button 
-                  size="sm" 
-                  onClick={handleVerMaisClick} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold btn-responsive text-xs sm:text-sm"
-                >
-                  Ver detalhes
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={handleBuyClick}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold btn-responsive text-xs sm:text-sm"
-                >
-                  <ShoppingBag className="w-4 h-4 mr-1" />
-                  <span className="hidden sm:inline">Comprar</span>
-                </Button>
+              
+              {/* Preço e Ações */}
+              <div className="flex items-center justify-between gap-4">
+                <div className="font-bold text-green-600 text-lg sm:text-xl flex-shrink-0">
+                  {formatPrice(product.valor)}
+                </div>
+                
+                {/* Área dos Botões - Organizados */}
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <FavoriteButton 
+                    productId={product.id} 
+                    size="sm" 
+                    showText={false}
+                    className="min-w-[40px] h-9"
+                  />
+                  <Button 
+                    size="sm" 
+                    onClick={handleVerMaisClick} 
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs px-3 py-2 h-9 min-w-[80px] whitespace-nowrap"
+                  >
+                    Ver detalhes
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={handleBuyClick}
+                    className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs px-3 py-2 h-9 min-w-[44px] flex items-center justify-center"
+                  >
+                    <ShoppingBag className="w-4 h-4" />
+                    <span className="hidden sm:inline ml-1">Comprar</span>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
