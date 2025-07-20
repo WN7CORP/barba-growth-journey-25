@@ -11,6 +11,7 @@ interface ProductPhotosModalProps {
   productPrice: string;
   productLink: string;
   videoUrl?: string;
+  className?: string;
 }
 
 export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
@@ -18,7 +19,8 @@ export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
   productName,
   productPrice,
   productLink,
-  videoUrl
+  videoUrl,
+  className
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -39,7 +41,7 @@ export const ProductPhotosModal: React.FC<ProductPhotosModalProps> = ({
           <Button 
             size="sm" 
             variant="outline" 
-            className="text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 hover:text-purple-700 hover:border-purple-300 transition-all duration-300 hover:scale-105"
+            className={`text-xs bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100 hover:text-purple-700 hover:border-purple-300 transition-all duration-300 hover:scale-105 ${className || ''}`}
           >
             <Images className="w-3 h-3 mr-1" />
             <span className="hidden sm:inline">Ver Fotos</span>
