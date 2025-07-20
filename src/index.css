@@ -203,9 +203,24 @@
     -webkit-line-clamp: 3;
   }
   
-  /* Responsive utilities */
+  /* Container responsivo com margens adequadas */
   .container-responsive {
     @apply w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Alvos de toque adequados para mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Padding mobile-friendly */
+  .mobile-padding {
+    @apply px-3 py-2 sm:px-4 sm:py-3;
+  }
+  
+  /* Texto responsivo */
+  .mobile-text {
+    @apply text-sm sm:text-base leading-relaxed;
   }
   
   /* Interactive utilities */

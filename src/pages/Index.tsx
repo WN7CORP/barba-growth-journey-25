@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowRight, ShoppingCart, SortAsc, DollarSign, Scale, Gavel, BookOpen, GraduationCap, Briefcase, TrendingUp } from 'lucide-react';
@@ -269,7 +268,7 @@ const Index = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
         <Header onSearch={handleSearch} onPriceFilter={handlePriceFilter} />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container-responsive py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
@@ -301,8 +300,8 @@ const Index = () => {
       />
       
       {/* Category Quick Access Buttons */}
-      <section className="px-4 py-2 animate-fade-in">
-        <div className="max-w-7xl mx-auto">
+      <section className="mobile-padding py-2 animate-fade-in">
+        <div className="container-responsive">
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
             <Button
               size="sm"
@@ -335,9 +334,9 @@ const Index = () => {
       {/* Hero Section */}
       <HeroSection productsCount={filteredProducts.length} />
 
-      {/* Most Purchased Section - NEW */}
-      <section className="px-4 md:px-6 py-6 animate-fade-in bg-gradient-to-r from-green-900/30 to-blue-900/30 backdrop-blur-sm">
-        <div className="max-w-7xl mx-auto">
+      {/* Most Purchased Section */}
+      <section className="mobile-padding py-6 animate-fade-in bg-gradient-to-r from-green-900/30 to-blue-900/30 backdrop-blur-sm">
+        <div className="container-responsive">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-green-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -394,8 +393,8 @@ const Index = () => {
         if (categoryProducts.length === 0) return null;
         
         return (
-          <section key={category} className="px-4 md:px-6 py-4 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-            <div className="max-w-7xl mx-auto">
+          <section key={category} className="mobile-padding py-4 animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+            <div className="container-responsive">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-purple-500/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -439,9 +438,9 @@ const Index = () => {
         );
       })}
 
-      {/* Featured Products Carousel with Toggle - CARDS MENORES */}
-      <section className="px-4 md:px-6 py-8 md:py-12 bg-white/10 backdrop-blur-sm animate-fade-in">
-        <div className="max-w-7xl mx-auto">
+      {/* Featured Products Carousel with Toggle */}
+      <section className="mobile-padding py-8 md:py-12 bg-white/10 backdrop-blur-sm animate-fade-in">
+        <div className="container-responsive">
           <div className="text-center mb-8">
             <TabNavigation 
               showingAI={showingAI}
@@ -450,20 +449,20 @@ const Index = () => {
             
             {showingAI ? (
               <div className="prose prose-invert max-w-none">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
                   ⚖️ Consultor Jurídico IA
                 </h2>
-                <div className="text-base text-white/90 animate-slide-in-right space-y-2">
+                <div className="text-sm sm:text-base text-white/90 animate-slide-in-right space-y-2">
                   <p><strong>Selecione até 5 produtos</strong> e nossa <strong>IA especializada</strong> irá recomendar o melhor para sua carreira jurídica</p>
                   <p className="text-sm">✨ <em>Análise personalizada baseada em sua área de atuação</em></p>
                 </div>
               </div>
             ) : (
               <div>
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
                   📚 Mais Procurados pelos Juristas
                 </h2>
-                <p className="text-base text-white/80 animate-slide-in-right">
+                <p className="text-sm sm:text-base text-white/80 animate-slide-in-right">
                   {currentFeaturedCategory && currentFeaturedCategory !== 'Destaques Jurídicos' 
                     ? `Os favoritos em ${currentFeaturedCategory}` 
                     : 'Os materiais mais utilizados pelos profissionais do direito'}
@@ -537,21 +536,21 @@ const Index = () => {
 
       {/* Category Filter and Products Grid - only show when not in AI mode */}
       {!showingAI && (
-        <section className="px-4 md:px-6 py-8 md:py-12 animate-fade-in">
-          <div className="max-w-7xl mx-auto">
+        <section className="mobile-padding py-8 md:py-12 animate-fade-in">
+          <div className="container-responsive">
             <div className="flex items-center justify-between mb-6">
               <div className="text-center flex-1">
-                <h2 className="text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 animate-slide-in-left">
                   Explorar Biblioteca Jurídica
                 </h2>
-                <p className="text-base text-white/80 mb-4 animate-slide-in-right">
+                <p className="text-sm sm:text-base text-white/80 mb-4 animate-slide-in-right">
                   {searchTerm ? `Resultados para "${searchTerm}"` : 'Navegue por nossa coleção especializada em direito'}
                 </p>
               </div>
               
               <div className="flex gap-2 animate-slide-in-right">
                 <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-                  <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
+                  <SelectTrigger className="bg-white text-gray-900 border-0 w-28 sm:w-32">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-white border-gray-300 z-50">
@@ -641,17 +640,17 @@ const Index = () => {
 
       {/* CTA Section - only show when not in AI mode */}
       {!showingAI && (
-        <section className="px-4 md:px-6 py-12 md:py-16 bg-gradient-to-r from-blue-800 via-indigo-800 to-blue-900 relative overflow-hidden animate-fade-in">
+        <section className="mobile-padding py-12 md:py-16 bg-gradient-to-r from-blue-800 via-indigo-800 to-blue-900 relative overflow-hidden animate-fade-in">
           <div className="absolute inset-0 bg-black/20"></div>
-          <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="container-responsive text-center relative z-10">
             <div className="space-y-6">
               <div className="w-16 h-16 md:w-20 md:h-20 bg-amber-500/20 rounded-3xl flex items-center justify-center mx-auto animate-bounce">
                 <Scale className="w-8 h-8 md:w-10 md:h-10 text-amber-300 animate-pulse" />
               </div>
-              <h2 className="text-2xl md:text-4xl font-bold mb-4 text-white animate-slide-in-left">
+              <h2 className="text-xl sm:text-2xl md:text-4xl font-bold mb-4 text-white animate-slide-in-left">
                 Fortaleça sua Carreira Jurídica!
               </h2>
-              <p className="text-white/90 text-base md:text-lg max-w-2xl mx-auto leading-relaxed animate-slide-in-right">
+              <p className="text-white/90 text-sm sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed animate-slide-in-right">
                 Descubra os melhores materiais jurídicos com preços especiais para advogados, estudantes e operadores do direito
               </p>
               <Button 

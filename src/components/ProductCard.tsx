@@ -72,7 +72,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   }, []);
 
   const handleCardClick = useCallback((e: React.MouseEvent) => {
-    // Evitar abrir o modal se clicar em botões específicos
     if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[role="button"]') || (e.target as HTMLElement).closest('.carousel-nav')) {
       return;
     }
@@ -99,26 +98,27 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-4 p-4 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-100 hover:border-purple-200" onClick={handleCardClick}>
-          {/* Capa Compacta */}
-          <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+        <div className="flex gap-3 p-3 bg-gray-50/80 rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-200 hover:border-blue-300 mx-2 sm:mx-0">
+          {/* Capa Compacta - Tamanho fixo */}
+          <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
             <LazyImage 
               src={product.imagem1} 
               alt={product.produto}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
           
           {/* Informações do Produto */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-base mb-2 leading-tight">
+              {/* Título com altura fixa para uniformidade */}
+              <h3 className="font-bold text-gray-900 text-sm sm:text-base mb-2 leading-tight h-10 overflow-hidden line-clamp-2">
                 {product.produto}
               </h3>
               <div className="flex items-center gap-2 mb-2">
                 <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
                   <CategoryIcon className="w-3 h-3" />
-                  {product.categoria}
+                  <span className="hidden sm:inline">{product.categoria}</span>
                 </Badge>
                 <div className="flex items-center gap-1">
                   <Star className="w-3 h-3 text-amber-500 fill-current" />
@@ -128,11 +128,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
             
             {/* Preço e Ações */}
-            <div className="flex items-center justify-between">
-              <div className="font-bold text-green-600 text-lg">
+            <div className="flex items-center justify-between gap-2">
+              <div className="font-bold text-green-600 text-lg sm:text-xl drop-shadow-sm">
                 {formatPrice(product.valor)}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <FavoriteButton 
                   productId={product.id} 
                   size="sm" 
@@ -141,17 +141,18 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                 <Button 
                   size="sm" 
                   onClick={handleVerMaisClick} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-2 sm:px-3 text-xs sm:text-sm h-8"
                 >
-                  Ver detalhes
+                  <span className="hidden sm:inline">Ver detalhes</span>
+                  <span className="sm:hidden">Ver</span>
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={handleBuyClick}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-4"
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-2 sm:px-3 text-xs sm:text-sm h-8"
                 >
-                  <ShoppingBag className="w-4 h-4 mr-1" />
-                  Comprar
+                  <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">Comprar</span>
                 </Button>
               </div>
             </div>
@@ -173,8 +174,9 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         style={style}
         className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
-          bg-white border-0 shadow-xl group animate-fade-in cursor-pointer
-          ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
+          bg-gradient-to-br from-gray-50 to-white border border-gray-200 shadow-lg group animate-fade-in cursor-pointer
+          ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-blue-100'}
+          ${compact ? 'h-72' : 'h-80'}
         `}
         onClick={handleCardClick}
       >
@@ -183,11 +185,11 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="aspect-[3/4] overflow-hidden">
+                  <div className={`${compact ? 'aspect-[3/4] h-40' : 'aspect-[3/4] h-48'} overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200`}>
                     <LazyImage 
                       src={image} 
                       alt={`${product.produto} - ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                 </CarouselItem>
@@ -224,7 +226,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
           )}
 
-          {/* Favorite button - sempre presente no canto superior esquerdo se não houver badge ou seleção */}
           {!showBadge && !selectable && (
             <div className={`absolute ${compact ? 'top-1 left-1' : 'top-2 left-2'}`}>
               <FavoriteButton productId={product.id} showText={false} />
@@ -232,15 +233,16 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        <CardContent className={compact ? "p-3" : "p-4"}>
-          <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
+        <CardContent className={compact ? "p-3 h-32" : "p-4 h-32"}>
+          {/* Título com altura fixa para uniformidade */}
+          <h3 className={`font-semibold text-gray-900 mb-2 hover:text-purple-700 transition-colors leading-tight h-10 overflow-hidden line-clamp-2 ${
             compact ? 'text-sm' : 'text-base'
           }`}>
             {product.produto}
           </h3>
           
           <div className="flex items-center justify-between mb-3">
-            <div className={`font-bold text-green-600 ${compact ? 'text-sm' : 'text-lg'}`}>
+            <div className={`font-bold text-green-600 drop-shadow-sm ${compact ? 'text-base' : 'text-lg'}`}>
               {formatPrice(product.valor)}
             </div>
             <div className="flex items-center gap-1">
@@ -250,7 +252,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           </div>
           
           <div className="space-y-2">
-            {/* Sempre mostrar botão de favoritar no conteúdo do card se houver badge ou seleção */}
             {(showBadge || selectable) && (
               <div className="flex gap-1 mb-2">
                 <FavoriteButton productId={product.id} />
@@ -261,7 +262,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               size="sm" 
               variant="outline"
               className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 ${
-                compact ? 'py-2 text-sm' : 'py-3 text-base'
+                compact ? 'py-2 text-sm h-8' : 'py-3 text-base h-10'
               }`}
               onClick={handleVerMaisClick}
             >
