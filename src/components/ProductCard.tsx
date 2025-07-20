@@ -99,26 +99,26 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="flex gap-4 p-4 bg-white rounded-xl hover:shadow-lg transition-all cursor-pointer border border-gray-100 hover:border-purple-200" onClick={handleCardClick}>
-          {/* Capa Compacta */}
-          <div className="w-16 h-20 flex-shrink-0 rounded-lg overflow-hidden">
+        <div className="flex gap-4 p-3 bg-white/95 backdrop-blur-sm rounded-xl hover:shadow-lg transition-all cursor-pointer border border-white/20 hover:border-purple-200 min-h-[120px]" onClick={handleCardClick}>
+          {/* Capa Maior */}
+          <div className="w-20 h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
             <LazyImage 
               src={product.imagem1} 
               alt={product.produto}
-              className="w-full h-full object-cover"
+              className="w-full h-full object-contain"
             />
           </div>
           
-          {/* Informações do Produto */}
+          {/* Informações do Produto - Layout Flexível */}
           <div className="flex-1 min-w-0 flex flex-col justify-between">
             <div>
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-base mb-2 leading-tight">
+              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base mb-2 leading-tight">
                 {product.produto}
               </h3>
-              <div className="flex items-center gap-2 mb-2">
+              <div className="flex items-center gap-2 mb-2 flex-wrap">
                 <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
                   <CategoryIcon className="w-3 h-3" />
-                  {product.categoria}
+                  <span className="hidden sm:inline">{product.categoria}</span>
                 </Badge>
                 <div className="flex items-center gap-1">
                   <Star className="w-3 h-3 text-amber-500 fill-current" />
@@ -127,12 +127,12 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               </div>
             </div>
             
-            {/* Preço e Ações */}
-            <div className="flex items-center justify-between">
-              <div className="font-bold text-green-600 text-lg">
+            {/* Preço e Ações - Responsivo */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <div className="font-bold text-green-600 text-lg sm:text-xl">
                 {formatPrice(product.valor)}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 <FavoriteButton 
                   productId={product.id} 
                   size="sm" 
@@ -141,17 +141,17 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
                 <Button 
                   size="sm" 
                   onClick={handleVerMaisClick} 
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-1.5 text-xs sm:text-sm touch-target"
                 >
                   Ver detalhes
                 </Button>
                 <Button 
                   size="sm" 
                   onClick={handleBuyClick}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-4"
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-3 py-1.5 text-xs sm:text-sm touch-target"
                 >
                   <ShoppingBag className="w-4 h-4 mr-1" />
-                  Comprar
+                  <span className="hidden sm:inline">Comprar</span>
                 </Button>
               </div>
             </div>
@@ -173,21 +173,21 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
         style={style}
         className={`
           overflow-hidden hover:shadow-2xl transition-all duration-500 hover:scale-105 
-          bg-white border-0 shadow-xl group animate-fade-in cursor-pointer
+          bg-white/95 backdrop-blur-sm border-0 shadow-xl group animate-fade-in cursor-pointer h-80 flex flex-col
           ${selected ? 'ring-2 ring-purple-600 shadow-xl shadow-purple-200' : 'hover:shadow-purple-100'}
         `}
         onClick={handleCardClick}
       >
-        <div className="relative">
-          <Carousel className="w-full">
+        <div className="relative flex-1">
+          <Carousel className="w-full h-full">
             <CarouselContent>
               {images.map((image, index) => (
                 <CarouselItem key={index}>
-                  <div className="aspect-[3/4] overflow-hidden">
+                  <div className="aspect-[3/4] overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
                     <LazyImage 
                       src={image} 
                       alt={`${product.produto} - ${index + 1}`}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      className="w-full h-full object-contain transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
                 </CarouselItem>
@@ -232,20 +232,22 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           )}
         </div>
 
-        <CardContent className={compact ? "p-3" : "p-4"}>
-          <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
-            compact ? 'text-sm' : 'text-base'
-          }`}>
-            {product.produto}
-          </h3>
-          
-          <div className="flex items-center justify-between mb-3">
-            <div className={`font-bold text-green-600 ${compact ? 'text-sm' : 'text-lg'}`}>
-              {formatPrice(product.valor)}
-            </div>
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 text-amber-500 fill-current" />
-              <span className="text-sm text-gray-600 font-medium">4.8</span>
+        <CardContent className="p-3 flex flex-col justify-between flex-shrink-0">
+          <div>
+            <h3 className={`font-semibold text-gray-900 mb-2 line-clamp-2 hover:text-purple-700 transition-colors leading-tight ${
+              compact ? 'text-sm' : 'text-sm sm:text-base'
+            }`}>
+              {product.produto}
+            </h3>
+            
+            <div className="flex items-center justify-between mb-3">
+              <div className={`font-bold text-green-600 ${compact ? 'text-base' : 'text-lg sm:text-xl'}`}>
+                {formatPrice(product.valor)}
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 text-amber-500 fill-current" />
+                <span className="text-sm text-gray-600 font-medium">4.8</span>
+              </div>
             </div>
           </div>
           
@@ -260,8 +262,8 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             <Button 
               size="sm" 
               variant="outline"
-              className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 ${
-                compact ? 'py-2 text-sm' : 'py-3 text-base'
+              className={`w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 touch-target ${
+                compact ? 'py-2 text-xs' : 'py-2.5 text-sm'
               }`}
               onClick={handleVerMaisClick}
             >

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Grid, List, SortAsc, DollarSign } from 'lucide-react';
@@ -153,7 +154,7 @@ const CategoriaLista = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
-        <div className="container mx-auto px-4 py-8">
+        <div className="container-responsive py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
@@ -167,20 +168,20 @@ const CategoriaLista = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
-      <div className="container mx-auto px-4 py-8">
+      <div className="container-responsive py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8 animate-fade-in">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate('/categorias')} 
-            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
+            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105 touch-target"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Voltar
           </Button>
           <div className="flex-1">
-            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
               {getPageTitle()}
             </h1>
             <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
@@ -196,10 +197,10 @@ const CategoriaLista = () => {
               size="sm"
               variant={viewMode === 'grid' ? 'default' : 'outline'}
               onClick={() => setViewMode('grid')}
-              className={viewMode === 'grid' 
+              className={`touch-target ${viewMode === 'grid' 
                 ? 'bg-white text-blue-900' 
                 : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
-              }
+              }`}
             >
               <Grid className="w-4 h-4" />
             </Button>
@@ -207,10 +208,10 @@ const CategoriaLista = () => {
               size="sm"
               variant={viewMode === 'list' ? 'default' : 'outline'}
               onClick={() => setViewMode('list')}
-              className={viewMode === 'list' 
+              className={`touch-target ${viewMode === 'list' 
                 ? 'bg-white text-blue-900' 
                 : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
-              }
+              }`}
             >
               <List className="w-4 h-4" />
             </Button>
@@ -218,7 +219,7 @@ const CategoriaLista = () => {
           
           <div className="flex gap-2">
             <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-              <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
+              <SelectTrigger className="bg-white text-gray-900 border-0 w-32 touch-target">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white border-gray-300 z-50">
@@ -240,7 +241,7 @@ const CategoriaLista = () => {
               size="sm"
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
+              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target"
             >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </Button>
@@ -259,13 +260,16 @@ const CategoriaLista = () => {
             <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
               <div className="w-16 h-16 text-white/50">📦</div>
             </div>
-            <h2 className="text-2xl font-bold text-white mb-4">
+            <h2 className="text-xl sm:text-2xl font-bold text-white mb-4">
               Nenhum produto encontrado
             </h2>
-            <p className="text-white/80 mb-6">
+            <p className="text-white/80 mb-6 mobile-text">
               Não há produtos disponíveis nesta categoria no momento
             </p>
-            <Button onClick={() => navigate('/categorias')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
+            <Button 
+              onClick={() => navigate('/categorias')} 
+              className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 touch-target"
+            >
               Explorar Outras Categorias
             </Button>
           </div>
