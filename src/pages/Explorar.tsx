@@ -12,10 +12,10 @@ interface Product {
   produto: string;
   valor: string;
   imagem1: string;
-  imagem2?: string;
-  imagem3?: string;
-  imagem4?: string;
-  imagem5?: string;
+  imagem2: string;
+  imagem3: string;
+  imagem4: string;
+  imagem5: string;
   link: string;
   categoria: string;
 }
@@ -98,38 +98,36 @@ const Explorar = () => {
   return (
     <div className="min-h-screen bg-black">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm safe-top">
-        <div className="flex items-center justify-between mobile-padding">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm">
+        <div className="flex items-center justify-between p-4">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate('/')}
-            className="text-white hover:bg-white/20 touch-target"
+            className="text-white hover:bg-white/20"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            <span className="hidden sm:inline">Voltar</span>
+            Voltar
           </Button>
 
           <h1 className="text-white font-bold text-xl">Explorar</h1>
 
-          <div className="flex gap-1 sm:gap-2">
+          <div className="flex gap-2">
             <Button
               variant={viewMode === 'grid' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('grid')}
-              className={`touch-target ${viewMode === 'grid' ? 'bg-orange-500 hover:bg-orange-600' : 'text-white hover:bg-white/20'}`}
+              className={viewMode === 'grid' ? 'bg-orange-500 hover:bg-orange-600' : 'text-white hover:bg-white/20'}
             >
               <Grid3X3 className="w-4 h-4" />
-              <span className="hidden sm:inline ml-1">Grade</span>
             </Button>
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setViewMode('list')}
-              className={`touch-target ${viewMode === 'list' ? 'bg-orange-500 hover:bg-orange-600' : 'text-white hover:bg-white/20'}`}
+              className={viewMode === 'list' ? 'bg-orange-500 hover:bg-orange-600' : 'text-white hover:bg-white/20'}
             >
               <List className="w-4 h-4" />
-              <span className="hidden sm:inline ml-1">Lista</span>
             </Button>
           </div>
         </div>
@@ -144,9 +142,9 @@ const Explorar = () => {
       </div>
 
       {/* Content */}
-      <div className="pt-32 safe-bottom">
-        <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 mobile-padding">
-          <div className="container-responsive">
+      <div className="pt-32">
+        <div className="min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-pink-500 p-4">
+          <div className="max-w-7xl mx-auto">
             <ProductGrid 
               products={filteredProducts} 
               compact={viewMode === 'grid'} 

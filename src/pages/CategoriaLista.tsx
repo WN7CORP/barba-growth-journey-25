@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Grid, List, SortAsc, DollarSign } from 'lucide-react';
@@ -34,8 +33,8 @@ const CategoriaLista = () => {
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'nome' | 'preco'>('nome');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  // Padrão para lista compacta sempre, mais estratégico para navegação
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  // Default para lista compacta quando vem de categorias
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(viewParam === 'grid' ? 'grid' : 'list');
   
   const { data: mostPurchased } = useMostPurchased(100);
 
@@ -154,7 +153,7 @@ const CategoriaLista = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
         <Header onSearch={() => {}} onPriceFilter={() => {}} />
-        <div className="container-responsive py-6 sm:py-8">
+        <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-32 bg-white/20 rounded-2xl animate-shimmer"></div>
             <ProductGrid loading={true} products={[]} />
@@ -168,60 +167,58 @@ const CategoriaLista = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 pb-20">
       <Header onSearch={() => {}} onPriceFilter={() => {}} />
       
-      <div className="container-responsive py-6 sm:py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="flex items-center mobile-gap mb-6 sm:mb-8 animate-fade-in">
+        <div className="flex items-center gap-4 mb-8 animate-fade-in">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={() => navigate('/categorias')} 
-            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105 touch-target mobile-padding"
+            className="text-white hover:bg-white/20 rounded-xl transition-all duration-300 hover:scale-105"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">Voltar</span>
+            Voltar
           </Button>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-4xl font-bold text-white animate-slide-in-left truncate">
+          <div className="flex-1">
+            <h1 className="text-2xl md:text-4xl font-bold text-white animate-slide-in-left">
               {getPageTitle()}
             </h1>
-            <p className="text-white/80 animate-slide-in-right mobile-text mt-1">
+            <p className="text-white/80 animate-slide-in-right text-sm md:text-lg">
               {getPageDescription()}
             </p>
           </div>
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6 mobile-gap animate-fade-in">
-          <div className="flex items-center gap-1 sm:gap-2">
+        <div className="flex items-center justify-between mb-6 gap-4 animate-fade-in">
+          <div className="flex items-center gap-2">
             <Button
               size="sm"
               variant={viewMode === 'grid' ? 'default' : 'outline'}
               onClick={() => setViewMode('grid')}
-              className={`touch-target px-2 sm:px-3 ${viewMode === 'grid' 
+              className={viewMode === 'grid' 
                 ? 'bg-white text-blue-900' 
                 : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
-              }`}
+              }
             >
               <Grid className="w-4 h-4" />
-              <span className="hidden sm:inline ml-1">Grade</span>
             </Button>
             <Button
               size="sm"
               variant={viewMode === 'list' ? 'default' : 'outline'}
               onClick={() => setViewMode('list')}
-              className={`touch-target px-2 sm:px-3 ${viewMode === 'list' 
+              className={viewMode === 'list' 
                 ? 'bg-white text-blue-900' 
                 : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
-              }`}
+              }
             >
               <List className="w-4 h-4" />
-              <span className="hidden sm:inline ml-1">Lista</span>
             </Button>
           </div>
           
-          <div className="flex gap-1 sm:gap-2">
+          <div className="flex gap-2">
             <Select value={sortBy} onValueChange={(value: 'nome' | 'preco') => setSortBy(value)}>
-              <SelectTrigger className="bg-white text-gray-900 border-0 w-24 sm:w-32 touch-target">
+              <SelectTrigger className="bg-white text-gray-900 border-0 w-32">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-white border-gray-300 z-50">
@@ -243,7 +240,7 @@ const CategoriaLista = () => {
               size="sm"
               variant="outline"
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105 touch-target"
+              className="bg-white text-gray-900 border-0 hover:bg-gray-100 transition-all duration-300 hover:scale-105"
             >
               {sortOrder === 'asc' ? '↑' : '↓'}
             </Button>
@@ -258,7 +255,7 @@ const CategoriaLista = () => {
         />
 
         {products.length === 0 && (
-          <div className="text-center py-16 animate-fade-in mobile-padding">
+          <div className="text-center py-16 animate-fade-in">
             <div className="w-32 h-32 bg-white/20 rounded-3xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm animate-pulse">
               <div className="w-16 h-16 text-white/50">📦</div>
             </div>
@@ -268,7 +265,7 @@ const CategoriaLista = () => {
             <p className="text-white/80 mb-6">
               Não há produtos disponíveis nesta categoria no momento
             </p>
-            <Button onClick={() => navigate('/categorias')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105 touch-target">
+            <Button onClick={() => navigate('/categorias')} className="bg-white text-blue-600 hover:bg-gray-100 font-semibold transition-all duration-300 hover:scale-105">
               Explorar Outras Categorias
             </Button>
           </div>
