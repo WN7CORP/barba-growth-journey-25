@@ -247,14 +247,14 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
             </div>
           </div>
           
-          {/* Botão Ver Mais - Redesenhado e Restaurado */}
+          {/* Botão Ver Detalhes - Redesenhado */}
           <Button 
             size="sm" 
             className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 border-0 py-2.5 rounded-xl" 
             onClick={handleVerMaisClick}
           >
-            <Eye className="w-4 h-4 mr-2" />
-            Ver Mais
+            <BookOpen className="w-4 h-4 mr-2" />
+            Ver detalhes
           </Button>
         </CardContent>
       </Card>

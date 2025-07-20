@@ -12,7 +12,6 @@ import CategoriaLista from "./pages/CategoriaLista";
 import SubcategoriaLista from "./pages/SubcategoriaLista";
 import MaisComprados from "./pages/MaisComprados";
 import Explorar from "./pages/Explorar";
-import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
@@ -31,8 +30,6 @@ const App = () => (
           <Route path="/subcategoria-lista" element={<SubcategoriaLista />} />
           <Route path="/mais-comprados" element={<MaisComprados />} />
           <Route path="/explorar" element={<Explorar />} />
-          {/* Catch-all route for 404 */}
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
