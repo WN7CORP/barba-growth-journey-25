@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Heart, ShoppingCart, Play, Star, ArrowLeft, Grid, List } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -13,19 +12,47 @@ import { useFavorites } from '@/hooks/useFavorites';
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from 'react-router-dom';
 
+// Interface unificada para produtos de diferentes tabelas
 interface Product {
   id: number;
   produto: string;
   valor: string;
-  video: string;
+  video?: string;
   imagem1: string;
-  imagem2: string;
-  imagem3: string;
-  imagem4: string;
-  imagem5: string;
+  imagem2?: string;
+  imagem3?: string;
+  imagem4?: string;
+  imagem5?: string;
+  imagem6?: string;
+  imagem7?: string;
   link: string;
   categoria: string;
+  subcategoria?: string;
+  uso?: string;
+  descricao?: string;
 }
+
+// Função para normalizar produtos de diferentes tabelas
+const normalizeProduct = (product: any): Product => {
+  return {
+    id: product.id,
+    produto: product.produto || '',
+    valor: product.valor || '',
+    video: product.video || '',
+    imagem1: product.imagem1 || '',
+    imagem2: product.imagem2 || '',
+    imagem3: product.imagem3 || '',
+    imagem4: product.imagem4 || '',
+    imagem5: product.imagem5 || '',
+    imagem6: product.imagem6 || '',
+    imagem7: product.imagem7 || '',
+    link: product.link || '',
+    categoria: product.categoria || '',
+    subcategoria: product.subcategoria || '',
+    uso: product.uso || '',
+    descricao: product.descricao || ''
+  };
+};
 
 const Favoritos = () => {
   const { favorites, removeFavorite } = useFavorites();
@@ -42,72 +69,99 @@ const Favoritos = () => {
   }, [favorites]);
 
   const fetchFavoriteProducts = async () => {
-    console.log('Buscando produtos favoritos para IDs:', favorites);
+    console.log('🔍 Buscando produtos favoritos para IDs:', favorites);
     
     if (favorites.length === 0) {
+      console.log('❌ Nenhum favorito encontrado');
       setProducts([]);
       setLoading(false);
       return;
     }
 
     try {
-      // Primeiro tenta buscar na tabela SHOPEE
-      let { data: shopeeData, error: shopeeError } = await supabase
+      let allProducts: any[] = [];
+
+      // Buscar na tabela SHOPEE
+      console.log('🔍 Buscando na tabela SHOPEE...');
+      const { data: shopeeData, error: shopeeError } = await supabase
         .from('SHOPEE')
         .select('*')
         .in('id', favorites);
 
-      console.log('Dados encontrados na SHOPEE:', shopeeData);
-      console.log('Erro na SHOPEE:', shopeeError);
+      if (shopeeError) {
+        console.error('❌ Erro ao buscar na SHOPEE:', shopeeError);
+      } else {
+        console.log('✅ Encontrados na SHOPEE:', shopeeData?.length || 0, 'produtos');
+        if (shopeeData) {
+          allProducts = [...allProducts, ...shopeeData];
+        }
+      }
 
-      let allProducts = shopeeData || [];
-
-      // Se não encontrou todos os produtos na SHOPEE, tenta na HARRY POTTER
+      // Se não encontrou todos, buscar na HARRY POTTER
       if (allProducts.length < favorites.length) {
+        console.log('🔍 Buscando na tabela HARRY POTTER...');
         const { data: harryData, error: harryError } = await supabase
           .from('HARRY POTTER')
           .select('*')
           .in('id', favorites);
 
-        console.log('Dados encontrados na HARRY POTTER:', harryData);
-        console.log('Erro na HARRY POTTER:', harryError);
-
-        if (harryData) {
-          allProducts = [...allProducts, ...harryData];
+        if (harryError) {
+          console.error('❌ Erro ao buscar na HARRY POTTER:', harryError);
+        } else {
+          console.log('✅ Encontrados na HARRY POTTER:', harryData?.length || 0, 'produtos');
+          if (harryData) {
+            allProducts = [...allProducts, ...harryData];
+          }
         }
       }
 
-      // Se ainda não encontrou todos, tenta na MUNDODODIREITO
+      // Se ainda não encontrou todos, buscar na MUNDODODIREITO
       if (allProducts.length < favorites.length) {
+        console.log('🔍 Buscando na tabela MUNDODODIREITO...');
         const { data: mundoData, error: mundoError } = await supabase
           .from('MUNDODODIREITO')
           .select('*')
           .in('id', favorites);
 
-        console.log('Dados encontrados na MUNDODODIREITO:', mundoData);
-        console.log('Erro na MUNDODODIREITO:', mundoError);
-
-        if (mundoData) {
-          allProducts = [...allProducts, ...mundoData];
+        if (mundoError) {
+          console.error('❌ Erro ao buscar na MUNDODODIREITO:', mundoError);
+        } else {
+          console.log('✅ Encontrados na MUNDODODIREITO:', mundoData?.length || 0, 'produtos');
+          if (mundoData) {
+            allProducts = [...allProducts, ...mundoData];
+          }
         }
       }
 
-      console.log('Total de produtos encontrados:', allProducts.length);
-      console.log('Produtos finais:', allProducts);
+      console.log('📊 Total de produtos encontrados:', allProducts.length);
+      console.log('📊 Favoritos esperados:', favorites.length);
 
-      setProducts(allProducts);
+      // Normalizar produtos para interface unificada
+      const normalizedProducts = allProducts.map(normalizeProduct);
+      console.log('✅ Produtos normalizados:', normalizedProducts.length);
+
+      setProducts(normalizedProducts);
+
+      // Log de debug para verificar IDs não encontrados
+      const foundIds = normalizedProducts.map(p => p.id);
+      const missingIds = favorites.filter(id => !foundIds.includes(id));
+      if (missingIds.length > 0) {
+        console.warn('⚠️ IDs favoritos não encontrados em nenhuma tabela:', missingIds);
+      }
+
     } catch (error) {
-      console.error('Erro ao buscar produtos favoritos:', error);
+      console.error('❌ Erro geral ao buscar produtos favoritos:', error);
     } finally {
       setLoading(false);
     }
   };
 
   const getProductImages = (product: Product) => {
-    return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5].filter(Boolean);
+    return [product.imagem1, product.imagem2, product.imagem3, product.imagem4, product.imagem5, product.imagem6, product.imagem7].filter(Boolean);
   };
 
   const formatPrice = (price: string) => {
+    if (!price) return 'Consulte o preço';
     if (price.includes('R$')) {
       return price;
     }
@@ -116,6 +170,7 @@ const Favoritos = () => {
 
   const handleRemoveFavorite = (productId: number, e: React.MouseEvent) => {
     e.stopPropagation();
+    console.log('❌ Removendo favorito:', productId);
     removeFavorite(productId);
   };
 
@@ -429,7 +484,7 @@ const Favoritos = () => {
         <ProductVideoModal
           isOpen={!!selectedVideoProduct}
           onClose={() => setSelectedVideoProduct(null)}
-          videoUrl={selectedVideoProduct.video}
+          videoUrl={selectedVideoProduct.video || ''}
           productName={selectedVideoProduct.produto}
           productPrice={formatPrice(selectedVideoProduct.valor)}
           productLink={selectedVideoProduct.link}
