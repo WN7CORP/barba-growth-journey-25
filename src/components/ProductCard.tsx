@@ -1,12 +1,11 @@
 
 import React, { useState, memo, useCallback } from 'react';
-import { Star, Scale, BookOpen, GraduationCap, ShoppingBag } from 'lucide-react';
+import { Star, Scale, BookOpen, GraduationCap, ShoppingBag, Eye } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ProductDetailModal } from '@/components/ProductDetailModal';
-import { FavoriteButton } from '@/components/FavoriteButton';
 import { LazyImage } from '@/components/LazyImage';
 
 interface Product {
@@ -99,66 +98,59 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
   if (listLayout) {
     return (
       <>
-        <div className="list-item-responsive">
-          {/* Imagem do Produto - Tamanho Fixo Otimizado */}
-          <div className="w-16 h-20 sm:w-20 sm:h-24 flex-shrink-0 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="list-item-professional">
+          {/* Imagem do Produto - Otimizada */}
+          <div className="product-image-container">
             <LazyImage 
               src={product.imagem1} 
               alt={product.produto} 
-              className="w-full h-full object-contain" 
+              className="w-full h-full object-contain rounded-lg" 
             />
           </div>
           
-          {/* Conteúdo Principal - Flex Otimizado */}
-          <div className="flex-1 min-w-0 flex flex-col justify-between gap-2">
-            {/* Título e Categoria */}
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 line-clamp-2 text-sm sm:text-base leading-tight mb-2 prevent-overflow">
-                {product.produto}
-              </h3>
-              <div className="flex items-center gap-2 mb-2 flex-wrap">
-                <Badge variant="secondary" className="text-xs bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1 flex-shrink-0">
-                  <CategoryIcon className="w-3 h-3" />
-                  <span className="hidden sm:inline truncate max-w-20">{product.categoria}</span>
-                </Badge>
-                <div className="flex items-center gap-1 flex-shrink-0">
-                  <Star className="w-3 h-3 text-amber-500 fill-current" />
-                  <span className="text-xs text-gray-600 font-medium">4.8</span>
-                </div>
-              </div>
+          {/* Conteúdo Principal - Layout Profissional */}
+          <div className="product-content-main">
+            {/* Categoria Badge */}
+            <div className="mb-2">
+              <Badge variant="secondary" className="category-badge">
+                <CategoryIcon className="w-3 h-3 mr-1" />
+                <span className="text-xs font-medium truncate">{product.categoria}</span>
+              </Badge>
             </div>
             
-            {/* Preço e Ações - Layout Otimizado */}
-            <div className="flex items-center justify-between gap-2 min-w-0">
-              <div className="font-bold text-green-600 text-base sm:text-lg flex-shrink-0 prevent-overflow">
+            {/* Título do Produto */}
+            <h3 className="product-title-professional">
+              {product.produto}
+            </h3>
+            
+            {/* Preço e Avaliação */}
+            <div className="product-info-row">
+              <div className="product-price-professional">
                 {formatPrice(product.valor)}
               </div>
-              
-              {/* Área dos Botões - Compacta e Responsiva */}
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <FavoriteButton 
-                  productId={product.id} 
-                  size="sm" 
-                  showText={false} 
-                  className="btn-compact-icon bg-white hover:bg-red-50" 
-                />
-                <Button 
-                  size="sm" 
-                  onClick={handleVerMaisClick} 
-                  className="btn-compact bg-blue-600 hover:bg-blue-700 text-white font-semibold whitespace-nowrap"
-                >
-                  <span className="hidden sm:inline">Detalhes</span>
-                  <span className="sm:hidden">Ver</span>
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={handleBuyClick} 
-                  className="btn-compact-icon bg-green-600 hover:bg-green-700 text-white font-bold flex items-center justify-center"
-                >
-                  <ShoppingBag className="w-3 h-3 sm:w-4 sm:h-4" />
-                </Button>
+              <div className="product-rating">
+                <Star className="w-4 h-4 text-amber-500 fill-current" />
+                <span className="text-sm font-semibold text-gray-700">4.8</span>
               </div>
             </div>
+          </div>
+          
+          {/* Área dos Botões - Redesenhada */}
+          <div className="product-buttons-area">
+            <Button 
+              onClick={handleVerMaisClick} 
+              className="btn-ver-detalhes"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              <span className="font-semibold">Ver Detalhes</span>
+            </Button>
+            <Button 
+              onClick={handleBuyClick} 
+              className="btn-comprar"
+            >
+              <ShoppingBag className="w-4 h-4 mr-2" />
+              <span className="font-bold">Comprar</span>
+            </Button>
           </div>
         </div>
         <ProductDetailModal 
@@ -227,13 +219,6 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
               </div>
             </div>
           )}
-
-          {/* Favorite button - sempre presente no canto superior direito se não houver badge ou seleção */}
-          {!showBadge && !selectable && (
-            <div className="absolute top-2 right-2">
-              <FavoriteButton productId={product.id} showText={false} />
-            </div>
-          )}
         </div>
 
         {/* Conteúdo - Altura Flexível com Altura Mínima */}
@@ -255,14 +240,7 @@ const ProductCardComponent: React.FC<ProductCardProps> = ({
           </div>
           
           {/* Botões - Área Fixa no Final */}
-          <div className="space-y-2 mt-auto">
-            {/* Sempre mostrar botão de favoritar no conteúdo do card se houver badge ou seleção */}
-            {(showBadge || selectable) && (
-              <div className="flex gap-1 mb-2">
-                <FavoriteButton productId={product.id} />
-              </div>
-            )}
-            
+          <div className="space-y-2 mt-auto">            
             <Button 
               size="sm" 
               variant="outline" 
